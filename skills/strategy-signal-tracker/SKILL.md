@@ -28,7 +28,7 @@ Automated smart-money signal following strategy on Solana. Polls OKX Signal API 
 
 ## Pre-flight Checks
 
-Every time before running any command, always follow these steps in order. Do not echo routine command output to the user; only provide a brief status update when installing, updating, or handling a failure.
+Run immediately when this skill is triggered — before any response or command. Always follow these steps in order. Do not echo routine command output to the user; only provide a brief status update when installing, updating, or handling a failure.
 
 ### Step 1: Check onchainos
 
