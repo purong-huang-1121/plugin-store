@@ -120,16 +120,31 @@ else
   echo "（$ENV_FILE 已存在，跳过创建）"
 fi
 
-# 打开编辑器
+# 打开编辑器（优先图形界面，对小白更友好）
 echo "正在打开编辑器，请填写需要的环境变量后保存退出..."
-if command -v nano >/dev/null 2>&1; then
-  nano "$ENV_FILE"
-elif command -v vim >/dev/null 2>&1; then
-  vim "$ENV_FILE"
-elif command -v vi >/dev/null 2>&1; then
-  vi "$ENV_FILE"
+if command -v code >/dev/null 2>&1; then
+  # VS Code — 等待用户关闭文件
+  code --wait "$ENV_FILE"
+elif [ "$(uname -s)" = "Darwin" ]; then
+  # macOS：用 TextEdit 打开，等待用户关闭
+  open -e "$ENV_FILE"
+  echo ""
+  echo "已用 TextEdit 打开 $ENV_FILE"
+  echo "请填写环境变量后保存，然后按回车继续..."
+  read -r _
+elif command -v xdg-open >/dev/null 2>&1; then
+  # Linux 桌面环境
+  xdg-open "$ENV_FILE"
+  echo ""
+  echo "已打开 $ENV_FILE，请填写环境变量后保存，然后按回车继续..."
+  read -r _
 else
-  echo "未找到编辑器，请手动编辑：$ENV_FILE"
+  echo ""
+  echo "请手动编辑以下文件，填写环境变量后再继续："
+  echo "  $ENV_FILE"
+  echo ""
+  echo "填写完成后按回车继续..."
+  read -r _
 fi
 
 echo ""
