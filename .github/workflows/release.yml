@@ -46,19 +46,25 @@ jobs:
               ;;
           esac
 
-      - name: Build
+      - name: Build all binaries
         run: cargo build --release --target ${{ matrix.target }}
         working-directory: cli
 
-      - name: Rename binary
+      - name: Collect binaries
         run: |
-          cp cli/target/${{ matrix.target }}/release/plugin-store plugin-store-${{ matrix.target }}
+          mkdir -p artifacts
+          for bin in plugin-store strategy-auto-rebalance strategy-grid strategy-ranking-sniper strategy-signal-tracker strategy-memepump-scanner; do
+            src="cli/target/${{ matrix.target }}/release/${bin}"
+            if [ -f "$src" ]; then
+              cp "$src" "artifacts/${bin}-${{ matrix.target }}"
+            fi
+          done
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-store-${{ matrix.target }}
-          path: plugin-store-${{ matrix.target }}
+          name: binaries-${{ matrix.target }}
+          path: artifacts/
 
   release:
     name: Create Release
@@ -71,12 +77,12 @@ jobs:
           merge-multiple: true
 
       - name: Generate checksums
-        run: sha256sum plugin-store-* > checksums.txt
+        run: sha256sum * > checksums.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            plugin-store-*
+            *
             checksums.txt
           generate_release_notes: true
