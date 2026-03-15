@@ -395,200 +395,47 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 ## Flow A: USDC 智能调仓
 
+### Step 1：安装策略 Skill
 
-### Step Pre-flight — 确保 strategy-auto-rebalance 已安装
-
-> **⚠️ 必须最先执行。完成前不得向用户提问。**
-
-**Step 1：安装策略 Skill（AI 指令文件）**
 ```bash
 npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance --yes
 ```
 
-**Step 2：安装策略二进制**
+### Step 2：安装策略二进制
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-**Step 3：验证**
-```bash
-which strategy-auto-rebalance
-```
-- 成功 → 继续下一步
-- 失败 → 告知用户安装失败，检查网络
-### Step A1: Ask for chain
+### Step 3：交给策略 Skill 处理
 
-```
-USDC 智能调仓支持以下链：
+安装完成后，**策略 `strategy-auto-rebalance` 的 Skill 会自动接管**，引导用户完成链选择、资金配置、启动等全部流程。
 
-| 链 | Gas 成本 | 说明 |
-|----|----------|------|
-| Base | 极低 (~$0.01) | 推荐小资金用户 |
-| Ethereum | 较高 (~$2-10) | 大资金用户，协议 TVL 更高 |
+**不要在此 skill 里继续执行任何策略命令。**
 
-你想在哪条链上运行？(base / ethereum)
-```
-
-### Step A2: Ask for balance / check wallet
-
-After user selects chain:
-
-```
-好的，在 {chain} 上运行 USDC 智能调仓。
-
-请问你在 {chain} 上有多少 USDC 可以投入？
-（或者我可以帮你查一下钱包余额）
-```
-
-If user provides wallet address or says "帮我查" → use `skills-store portfolio` to check balance.
-
-### Step A3: Confirm and launch
-
-```
-确认启动参数：
-
-| 参数 | 值 |
-|------|---|
-| 策略 | USDC 智能调仓 |
-| 链 | {chain} |
-| 可用资金 | {amount} USDC |
-| 检查频率 | 每 60 分钟 |
-| 最小利差 | 0.5% |
-| 协议覆盖 | Aave V3 + Compound V3 + Morpho |
-
-确认启动？(Y/n)
-```
-
-After confirmation, execute:
-
-```bash
-strategy-auto-rebalance start --chain {chain} --interval 60 --min-spread 0.5
-```
-
-### Step A4: Post-launch guidance
-
-```
-智能调仓守护进程已启动！
-
-后续操作：
-• 查看状态：strategy-auto-rebalance status
-• 停止运行：strategy-auto-rebalance stop
-• 设置 Telegram 通知（推荐）：
-  export TELEGRAM_BOT_TOKEN=<TOKEN>
-  export TELEGRAM_CHAT_ID=<CHAT_ID>
-  strategy-auto-rebalance start --chain {chain}
-```
-
----
 
 ## Flow B: ETH/USDC 网格交易
 
-### Step B0: Pre-flight — 确保 strategy-grid 已安装
+### Step 1：安装策略 Skill
 
-> **⚠️ 必须最先执行。完成前不得向用户提问。**
-
-**Step 1：安装策略 Skill（AI 指令文件）**
 ```bash
 npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
 ```
 
-**Step 2：安装策略二进制**
+### Step 2：安装策略二进制
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-**Step 3：验证**
-```bash
-which strategy-grid
-```
-- 成功 → 继续下一步
-- 失败 → 告知用户安装失败，检查网络
-### Step B1: Confirm chain
+### Step 3：交给策略 Skill 处理
 
-```
-ETH/USDC 网格交易目前仅支持 Base 链。
+安装完成后，**策略 `strategy-grid-trade` 的 Skill 会自动接管**，引导用户完成链选择、资金配置、启动等全部流程。
 
-需要准备：
-• Base 链上的 ETH（用于交易 + Gas）
-• Base 链上的 USDC（用于交易）
-• 建议 ETH:USDC 比例约 50:50
+**不要在此 skill 里继续执行任何策略命令。**
 
-你在 Base 上有多少资金可以投入？
-（或者我可以帮你查一下钱包余额）
-```
-
-If user provides wallet address or says "帮我查" → use `skills-store portfolio` to check balance.
-
-### Step B2: Market analysis
-
-Before launching, run market analysis:
-
-```bash
-strategy-grid analyze
-```
-
-Present results to user:
-
-```
-当前市场状况：
-
-| 指标 | 值 |
-|------|---|
-| ETH 价格 | ${price} |
-| EMA-20 | ${ema} |
-| 波动率 | {vol}% |
-| 趋势 | {trend} |
-
-{market_comment}
-```
-
-Market comment logic:
-- Volatility > 3%: "波动率较高，网格策略表现良好的环境"
-- Volatility < 1%: "波动率偏低，网格收益可能有限"
-- Strong trend: "单边趋势中，注意仓位限制会自动保护"
-
-### Step B3: Confirm and launch
-
-```
-确认启动参数：
-
-| 参数 | 值 |
-|------|---|
-| 策略 | ETH/USDC 网格交易 |
-| 链 | Base |
-| 可用资金 | ~${total_usd} (ETH + USDC) |
-| 网格级数 | 6 |
-| 执行频率 | 每 60 秒（可通过 strategy-grid set --key tick_interval_secs 调整） |
-| 单笔上限 | 12% 总仓位 |
-| 仓位保护 | ETH 占比 35%~65% |
-
-确认启动？(Y/n)
-```
-
-After confirmation, execute:
-
-```bash
-strategy-grid start
-```
-
-### Step B4: Post-launch guidance
-
-```
-网格交易 Bot 已启动！
-
-后续操作：
-• 查看状态：strategy-grid status
-• 查看收益：strategy-grid report
-• 交易记录：strategy-grid history
-• 停止运行：strategy-grid stop
-• 市场分析：strategy-grid analyze
-• 调整参数：strategy-grid set --key <name> --value <value>
-• 查看配置：strategy-grid config
-```
-
----
 
 ## Flow C: 稳定币杠杆循环 (Aave Leverage Loop)
 
@@ -792,73 +639,66 @@ Alerts:
 
 ## Flow D: SOL 涨幅榜狙击 (Ranking Sniper)
 
+### Step 1：安装策略 Skill
 
-### Step Pre-flight — 确保 strategy-ranking-sniper 已安装
-
-> **⚠️ 必须最先执行。完成前不得向用户提问。**
-
-**Step 1：安装策略 Skill（AI 指令文件）**
 ```bash
 npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper --yes
 ```
 
-**Step 2：安装策略二进制**
+### Step 2：安装策略二进制
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-**Step 3：验证**
-```bash
-which strategy-ranking-sniper
-```
-- 成功 → 继续下一步
-- 失败 → 告知用户安装失败，检查网络
+### Step 3：交给策略 Skill 处理
+
+安装完成后，**策略 `strategy-ranking-sniper` 的 Skill 会自动接管**，引导用户完成链选择、资金配置、启动等全部流程。
+
+**不要在此 skill 里继续执行任何策略命令。**
+
+
 ## Flow E: SOL 聪明钱跟单 (Signal Tracker)
 
+### Step 1：安装策略 Skill
 
-### Step Pre-flight — 确保 strategy-signal-tracker 已安装
-
-> **⚠️ 必须最先执行。完成前不得向用户提问。**
-
-**Step 1：安装策略 Skill（AI 指令文件）**
 ```bash
 npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker --yes
 ```
 
-**Step 2：安装策略二进制**
+### Step 2：安装策略二进制
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-signal-tracker
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-**Step 3：验证**
-```bash
-which strategy-signal-tracker
-```
-- 成功 → 继续下一步
-- 失败 → 告知用户安装失败，检查网络
+### Step 3：交给策略 Skill 处理
+
+安装完成后，**策略 `strategy-signal-tracker` 的 Skill 会自动接管**，引导用户完成链选择、资金配置、启动等全部流程。
+
+**不要在此 skill 里继续执行任何策略命令。**
+
+
 ## Flow F: SOL Memepump 扫描 (Memepump Scanner)
 
+### Step 1：安装策略 Skill
 
-### Step Pre-flight — 确保 strategy-memepump-scanner 已安装
-
-> **⚠️ 必须最先执行。完成前不得向用户提问。**
-
-**Step 1：安装策略 Skill（AI 指令文件）**
 ```bash
 npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner --yes
 ```
 
-**Step 2：安装策略二进制**
+### Step 2：安装策略二进制
+
 ```bash
 curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-memepump-scanner
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-**Step 3：验证**
-```bash
-which strategy-memepump-scanner
-```
-- 成功 → 继续下一步
-- 失败 → 告知用户安装失败，检查网络
+### Step 3：交给策略 Skill 处理
+
+安装完成后，**策略 `strategy-memepump-scanner` 的 Skill 会自动接管**，引导用户完成链选择、资金配置、启动等全部流程。
+
+**不要在此 skill 里继续执行任何策略命令。**
+
