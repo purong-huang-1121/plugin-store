@@ -21,7 +21,7 @@ set -e
 REPO="purong-huang-1121/skills-store"
 BINARY="skills-store"
 INSTALL_DIR="$HOME/.cargo/bin"
-CACHE_DIR="$HOME/.local/bin/.skills-store"
+CACHE_DIR="$HOME/.cargo/bin/.skills-store"
 CACHE_FILE="$CACHE_DIR/last_check"
 CACHE_TTL=43200  # 12 hours in seconds
 

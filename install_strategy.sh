@@ -21,7 +21,7 @@ set -e
 
 REPO="purong-huang-1121/skills-store"
 INSTALL_DIR="$HOME/.cargo/bin"
-CACHE_BASE="$HOME/.local/bin/.skills-store"
+CACHE_BASE="$HOME/.cargo/bin/.skills-store"
 
 STRATEGY="$1"
 
