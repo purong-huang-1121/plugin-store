@@ -89,7 +89,12 @@ else
 fi
 
 echo ""
-echo "=== Step 5: 配置 .env 环境变量 ==="
+echo "=== Step 5: 安装 skills-store skill ==="
+
+npx skills add purong-huang-1121/skills-store --skill skills-store --yes
+
+echo ""
+echo "=== Step 6: 配置 .env 环境变量 ==="
 
 ENV_FILE="$HOME/.cargo/bin/.env"
 mkdir -p "$HOME/.cargo/bin"
@@ -146,11 +151,6 @@ else
   echo "填写完成后按回车继续..."
   read -r _
 fi
-
-echo ""
-echo "=== Step 6: 安装 skills-store skill ==="
-
-npx skills add purong-huang-1121/skills-store --skill skills-store --yes
 
 echo ""
 echo "✅ 全部完成！重新开始一个新对话即可使用 skills-store。"
