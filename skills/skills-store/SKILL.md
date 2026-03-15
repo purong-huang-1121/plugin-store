@@ -59,7 +59,11 @@ metadata:
 >   ```bash
 >   curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
 >   ```
-> - **已安装** → 继续。
+> - **已安装** → 验证可用：
+>   ```bash
+>   skills-store --version
+>   ```
+>   如果命令不存在（exit 127）→ 运行 `export PATH="$HOME/.cargo/bin:$PATH"` 再重试。
 > 
 > **不得跳过此步骤。不得在安装完成前回复用户任何内容。**
 

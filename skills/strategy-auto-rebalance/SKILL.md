@@ -122,7 +122,7 @@ which strategy-auto-rebalance
 
 ## Pre-Start Confirmation
 
-**IMPORTANT**: Before executing `auto-rebalance start`, you MUST present the following summary to the user and ask for explicit confirmation. Do NOT start the daemon until the user approves.
+**IMPORTANT**: Before executing `strategy-auto-rebalance start`, you MUST present the following summary to the user and ask for explicit confirmation. Do NOT start the daemon until the user approves.
 
 Display a table like this:
 
@@ -210,9 +210,9 @@ strategy-auto-rebalance stop
 
 | # | Command | Auth | Description |
 |---|---------|------|-------------|
-| 1 | `auto-rebalance start` | Yes | Start auto-rebalance daemon (foreground) |
-| 2 | `auto-rebalance stop` | No | Stop running daemon via PID file |
-| 3 | `auto-rebalance status` | No | Show daemon status and recent activity |
+| 1 | `strategy-auto-rebalance start` | Yes | Start auto-rebalance daemon (foreground) |
+| 2 | `strategy-auto-rebalance stop` | No | Stop running daemon via PID file |
+| 3 | `strategy-auto-rebalance status` | No | Show daemon status and recent activity |
 
 ## CLI Command Reference
 
