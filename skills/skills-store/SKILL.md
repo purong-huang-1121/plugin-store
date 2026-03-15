@@ -259,7 +259,7 @@ TELEGRAM_CHAT_ID=你的ChatID
 Present the two automated strategies and the supported dApp ecosystem:
 
 ```
-目前内置了 6 个策略（3 个 EVM + 3 个 Solana）：
+目前商店有 6 个自动化策略（3 个 EVM + 3 个 Solana）：
 
 ┌─────────────────────────────────────────────────────────────────────┐
 │  A. USDC 智能调仓 (Auto-Rebalance)                                 │
@@ -398,6 +398,23 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 ## Flow A: USDC 智能调仓
 
+
+### Step Pre-flight — 确保 strategy-auto-rebalance 已安装
+
+在执行任何步骤前，先检查二进制：
+
+```bash
+which strategy-auto-rebalance
+```
+
+- **未找到** → 安装：
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
+  ```
+- **已安装** → 继续。
+
+> ⚠️ `npx skills add` 只安装 AI 指令文件，**不会**安装 `strategy-auto-rebalance` 二进制。
+
 ### Step A1: Ask for chain
 
 ```
@@ -464,6 +481,22 @@ strategy-auto-rebalance start --chain {chain} --interval 60 --min-spread 0.5
 ---
 
 ## Flow B: ETH/USDC 网格交易
+
+### Step B0: Pre-flight — 确保 strategy-grid 已安装
+
+在执行任何步骤前，先检查二进制：
+
+```bash
+which strategy-grid
+```
+
+- **未找到** → 安装：
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
+  ```
+- **已安装** → 继续。
+
+> ⚠️ `npx skills add` 只安装 AI 指令文件，**不会**安装 `strategy-grid` 二进制。
 
 ### Step B1: Confirm chain
 
@@ -752,6 +785,23 @@ Alerts:
 
 ## Flow D: SOL 涨幅榜狙击 (Ranking Sniper)
 
+
+### Step Pre-flight — 确保 strategy-ranking-sniper 已安装
+
+在执行任何步骤前，先检查二进制：
+
+```bash
+which strategy-ranking-sniper
+```
+
+- **未找到** → 安装：
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
+  ```
+- **已安装** → 继续。
+
+> ⚠️ `npx skills add` 只安装 AI 指令文件，**不会**安装 `strategy-ranking-sniper` 二进制。
+
 ### 原理
 
 实时监控 OKX Solana 涨幅排行榜 Top 20，当新代币首次上榜时，经过三级风控过滤 + Momentum Score 评分后自动买入，通过 6 层退出系统管理仓位。不预判哪个币能涨，而是吃上榜后的那一段动量。
@@ -807,6 +857,23 @@ strategy-ranking-sniper start
 ---
 
 ## Flow E: SOL 聪明钱跟单 (Signal Tracker)
+
+
+### Step Pre-flight — 确保 strategy-signal-tracker 已安装
+
+在执行任何步骤前，先检查二进制：
+
+```bash
+which strategy-signal-tracker
+```
+
+- **未找到** → 安装：
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-signal-tracker
+  ```
+- **已安装** → 继续。
+
+> ⚠️ `npx skills add` 只安装 AI 指令文件，**不会**安装 `strategy-signal-tracker` 二进制。
 
 ### 原理
 
@@ -872,6 +939,23 @@ strategy-signal-tracker start
 ---
 
 ## Flow F: SOL Memepump 扫描 (Memepump Scanner)
+
+
+### Step Pre-flight — 确保 strategy-memepump-scanner 已安装
+
+在执行任何步骤前，先检查二进制：
+
+```bash
+which strategy-memepump-scanner
+```
+
+- **未找到** → 安装：
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-memepump-scanner
+  ```
+- **已安装** → 继续。
+
+> ⚠️ `npx skills add` 只安装 AI 指令文件，**不会**安装 `strategy-memepump-scanner` 二进制。
 
 ### 原理
 
