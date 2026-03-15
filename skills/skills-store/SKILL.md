@@ -398,20 +398,25 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 ### Step Pre-flight — 确保 strategy-auto-rebalance 已安装
 
-> **⚠️ 必须最先执行。安装完成前不得向用户提问。**
+> **⚠️ 必须最先执行。完成前不得向用户提问。**
 
+**Step 1：安装策略 Skill（AI 指令文件）**
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance --yes
+```
+
+**Step 2：安装策略二进制**
+```bash
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Step 3：验证**
 ```bash
 which strategy-auto-rebalance
 ```
-
-- **未找到** → 安装（完成后再继续下一步）：
-  ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
-  ```
-- **已安装** → 继续。
-
-> `npx skills add` 只安装 AI 指令文件，**不安装**二进制，必须用上面命令单独安装。
-
+- 成功 → 继续下一步
+- 失败 → 告知用户安装失败，检查网络
 ### Step A1: Ask for chain
 
 ```
@@ -481,20 +486,25 @@ strategy-auto-rebalance start --chain {chain} --interval 60 --min-spread 0.5
 
 ### Step B0: Pre-flight — 确保 strategy-grid 已安装
 
-> **⚠️ 必须最先执行。安装完成前不得向用户提问。**
+> **⚠️ 必须最先执行。完成前不得向用户提问。**
 
+**Step 1：安装策略 Skill（AI 指令文件）**
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
+```
+
+**Step 2：安装策略二进制**
+```bash
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Step 3：验证**
 ```bash
 which strategy-grid
 ```
-
-- **未找到** → 安装（完成后再继续下一步）：
-  ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
-  ```
-- **已安装** → 继续。
-
-> `npx skills add` 只安装 AI 指令文件，**不安装**二进制，必须用上面命令单独安装。
-
+- 成功 → 继续下一步
+- 失败 → 告知用户安装失败，检查网络
 ### Step B1: Confirm chain
 
 ```
@@ -785,638 +795,70 @@ Alerts:
 
 ### Step Pre-flight — 确保 strategy-ranking-sniper 已安装
 
-> **⚠️ 必须最先执行。安装完成前不得向用户提问。**
+> **⚠️ 必须最先执行。完成前不得向用户提问。**
 
+**Step 1：安装策略 Skill（AI 指令文件）**
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper --yes
+```
+
+**Step 2：安装策略二进制**
+```bash
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Step 3：验证**
 ```bash
 which strategy-ranking-sniper
 ```
-
-- **未找到** → 安装（完成后再继续下一步）：
-  ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
-  ```
-- **已安装** → 继续。
-
-> `npx skills add` 只安装 AI 指令文件，**不安装**二进制，必须用上面命令单独安装。
-
-### 原理
-
-实时监控 OKX Solana 涨幅排行榜 Top 20，当新代币首次上榜时，经过三级风控过滤 + Momentum Score 评分后自动买入，通过 6 层退出系统管理仓位。不预判哪个币能涨，而是吃上榜后的那一段动量。
-
-### 策略细节
-
-1. **监控**: 每 10 秒轮询 OKX Solana 涨幅榜 Top 20
-2. **风控过滤** (25 项):
-   - Slot Guard: 蜜罐检测、Top10 集中度 ≤80%、Dev 持仓 ≤50%
-   - Advanced Safety: Bundler ≤30%、狙击手 ≤30%、Dev Rug 历史 ≤20
-   - Holder Risk: 13 项基础过滤 + 3 项可疑地址扫描
-3. **评分**: Smart Money 标签 +8 分、持仓分散度、低狙击手等信号加分，0-125 分达标后买入
-4. **退出机制** (6 层优先级):
-   - 排名退出（最高优先级）> 硬止损（-25%）> 快速止损（5min/-8%）
-   - 追踪止损（+8%激活/12%回撤）> 时间止损（6h）> 梯度止盈（+5%/+15%/+30% 分三批）
-5. **安全网**: 停止引擎自动清仓所有持仓，日亏损上限 15% 自动停机
-
-### 依赖的 skills-store 命令
-
-| CLI 命令 | 用途 |
-|----------|------|
-| `strategy-ranking-sniper tick` | 执行单次轮询 |
-| `strategy-ranking-sniper start` | 启动守护进程 |
-| `strategy-ranking-sniper stop` | 停止运行 |
-| `strategy-ranking-sniper status` | 查看状态 |
-| `strategy-ranking-sniper report` | 详细 PnL 报告 |
-
-### Step D1: Confirm and configure
-
-```
-SOL 涨幅榜狙击 运行在 Solana 链上。
-
-需要准备：
-• SOL 钱包私钥（用于签署链上交易）
-• 钱包中有足够 SOL（用于交易 + Gas）
-• skills-store 已安装
-
-请问你准备投入多少 SOL？（建议 0.5~2 SOL 起步测试）
-```
-
-### Step D2: Launch
-
-确认后，引导用户启动 Ranking Sniper：
-
-```bash
-# 查看当前配置
-strategy-ranking-sniper config
-
-# 启动
-strategy-ranking-sniper start
-```
-
----
-
+- 成功 → 继续下一步
+- 失败 → 告知用户安装失败，检查网络
 ## Flow E: SOL 聪明钱跟单 (Signal Tracker)
 
 
 ### Step Pre-flight — 确保 strategy-signal-tracker 已安装
 
-> **⚠️ 必须最先执行。安装完成前不得向用户提问。**
+> **⚠️ 必须最先执行。完成前不得向用户提问。**
 
+**Step 1：安装策略 Skill（AI 指令文件）**
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker --yes
+```
+
+**Step 2：安装策略二进制**
+```bash
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-signal-tracker
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Step 3：验证**
 ```bash
 which strategy-signal-tracker
 ```
-
-- **未找到** → 安装（完成后再继续下一步）：
-  ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-signal-tracker
-  ```
-- **已安装** → 继续。
-
-> `npx skills add` 只安装 AI 指令文件，**不安装**二进制，必须用上面命令单独安装。
-
-### 原理
-
-实时监控 SmartMoney / KOL / Whale 三类链上信号，当多个聪明钱钱包同时买入同一代币时，经过多层安全验证后自动跟单买入。不猜哪个币能涨，而是跟着最聪明的钱走。
-
-### 策略细节
-
-1. **监控**: 每 20 秒轮询 OKX Signal API，拉取三类钱包买入信号
-2. **服务端预过滤**: MC ≥ $200K / 流动性 ≥ $80K
-3. **客户端二次验证**:
-   - Holders ≥ 300 / Liq/MC ≥ 5% / Top10 ≤ 50%
-   - LP Burn ≥ 80% / Holder 密度 300/百万MC
-4. **Dev 零容忍检查**: rug 记录 = 0 / 发币数 ≤ 20 / 持仓 ≤ 15%
-5. **Bundler 操控检测**: ATH ≤ 25% / 数量 ≤ 5
-6. **分级仓位** (按同车钱包数):
-   - ≥8 个钱包 = 0.020 SOL
-   - ≥5 个钱包 = 0.015 SOL
-   - ≥3 个钱包 = 0.010 SOL
-7. **退出机制**:
-   - 成本感知 3 级止盈（+5%/+15%/+30% net）+ Trailing Stop（+12%激活/10%回撤）
-   - 硬止损 -10% + 时间衰减止损（15min→-10% / 30min→-8% / 60min→-5%）
-   - 趋势时间止损（15min K线反转）+ 4h 硬性退出
-8. **Session 风控**: 连续亏损 3 次暂停 10min / 累计亏损 0.05 SOL 暂停 30min / 累计 0.10 SOL 终止
-
-### 依赖的 skills-store 命令
-
-| CLI 命令 | 用途 |
-|----------|------|
-| `strategy-signal-tracker tick` | 执行单次轮询 |
-| `strategy-signal-tracker start` | 启动守护进程 |
-| `strategy-signal-tracker stop` | 停止运行 |
-| `strategy-signal-tracker status` | 查看状态 |
-| `strategy-signal-tracker report` | 详细 PnL 报告 |
-
-### Step E1: Confirm and configure
-
-```
-SOL 聪明钱跟单 运行在 Solana 链上。
-
-需要准备：
-• SOL 钱包私钥
-• 钱包中有足够 SOL
-• skills-store 已安装
-
-请问你准备投入多少 SOL？（建议 0.3~1 SOL 起步测试）
-```
-
-### Step E2: Launch
-
-确认后，引导用户启动 Signal Tracker：
-
-```bash
-# 查看当前配置
-strategy-signal-tracker config
-
-# 启动（推荐先用 dry-run 测试）
-strategy-signal-tracker start --dry-run
-
-# 确认无误后正式启动
-strategy-signal-tracker start
-```
-
----
-
+- 成功 → 继续下一步
+- 失败 → 告知用户安装失败，检查网络
 ## Flow F: SOL Memepump 扫描 (Memepump Scanner)
 
 
 ### Step Pre-flight — 确保 strategy-memepump-scanner 已安装
 
-> **⚠️ 必须最先执行。安装完成前不得向用户提问。**
+> **⚠️ 必须最先执行。完成前不得向用户提问。**
 
+**Step 1：安装策略 Skill（AI 指令文件）**
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner --yes
+```
+
+**Step 2：安装策略二进制**
+```bash
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-memepump-scanner
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+**Step 3：验证**
 ```bash
 which strategy-memepump-scanner
 ```
-
-- **未找到** → 安装（完成后再继续下一步）：
-  ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-memepump-scanner
-  ```
-- **已安装** → 继续。
-
-> `npx skills add` 只安装 AI 指令文件，**不安装**二进制，必须用上面命令单独安装。
-
-### 原理
-
-实时扫描 Pump.fun 迁移代币，通过服务端安全过滤 + 客户端预分类 + Dev/Bundler 深度验证后，基于三重信号检测（TX 加速 × 成交量突增 × 买压主导）确认动量后自动买入。不预判哪个 meme 能爆，而是捕捉安全验证后的动量爆发瞬间。
-
-### 策略细节
-
-1. **监控**: 每 10 秒调用 Trenches tokenList API 拉取已迁移代币
-2. **服务端过滤**:
-   - MC $80K-$800K / Holders ≥ 50 / Dev ≤ 10% / Bundler ≤ 15%
-   - Sniper ≤ 20% / Top10 ≤ 50% / 新钱包 ≤ 40% / 年龄 4-180min
-3. **客户端预分类**: B/S ratio ≥ 1.3 / Vol/MC ≥ 5% / Top10 ≤ 55%
-4. **Dev 零容忍检查**: rug = 0 / 发币 ≤ 20
-5. **Bundler 检测**: ATH ≤ 25% / 数量 ≤ 5
-6. **三重信号检测**:
-   - Signal A: TX 加速（当前/前分钟 ≥ 1.35× 或投影 ≥ 60/min）
-   - Signal B: 成交量突增（当前/5min 均值 ≥ 1.5-2.0×）
-   - Signal C: 买压主导（1h B/S ≥ 1.5）
-7. **分级仓位**:
-   - SCALP（A+C）= 0.0375 SOL
-   - MINIMUM（A+B+C 三信号共振）= 0.075 SOL
-   - Hot Mode 自适应（高活跃市场降低 A 门槛 1.35→1.2）
-8. **退出机制**:
-   - 成本感知 2 级止盈（+15%/+25% net）
-   - 分级止损（SCALP -15% / HOT -20% / QUIET -25%）
-   - 时间止损（SCALP 5min / HOT 8min / QUIET 15min）
-   - TP1 后 breakeven stop + Trailing -5%，最大持仓 30min
-
-### 依赖的 skills-store 命令
-
-| CLI 命令 | 用途 |
-|----------|------|
-| `strategy-memepump-scanner tick` | 执行单次扫描 |
-| `strategy-memepump-scanner start` | 启动守护进程 |
-| `strategy-memepump-scanner stop` | 停止运行 |
-| `strategy-memepump-scanner status` | 查看状态 |
-| `strategy-memepump-scanner report` | 详细 PnL 报告 |
-| `strategy-memepump-scanner analyze` | Dry-run 分析 |
-
-### Step F1: Confirm and configure
-
-```
-SOL Memepump 扫描 运行在 Solana 链上。
-
-需要准备：
-• SOL 钱包私钥
-• 钱包中有足够 SOL
-• skills-store 已安装
-
-请问你准备投入多少 SOL？（建议 0.2~0.5 SOL 起步测试）
-```
-
-### Step F2: Launch
-
-确认后，引导用户启动 Memepump Scanner：
-
-```bash
-# 查看当前配置
-strategy-memepump-scanner config
-
-# 先用 analyze 观察
-strategy-memepump-scanner analyze
-
-# 启动
-strategy-memepump-scanner start
-```
-
----
-
-## Strategy Comparison (Internal Reference)
-
-| 维度 | A: USDC 智能调仓 | B: ETH/USDC 网格 | C: 稳定币杠杆循环 | D: 涨幅榜狙击 | E: 聪明钱跟单 | F: Memepump 扫描 |
-|------|-------------------|-------------------|--------------------|---------------|---------------|-------------------|
-| 支持链 | Base, Ethereum | Base | Ethereum, Arbitrum, Polygon, Base | Solana | Solana | Solana |
-| 交易对 | USDC (单币) | ETH/USDC | USDC (单币) | SOL/Meme | SOL/Meme | SOL/Meme |
-| 收益来源 | 跨协议利差 | 网格价差 | Aave 存借利差 × 杠杆 | 涨幅榜动量 | 聪明钱信号 | Pump.fun 迁移动量 |
-| 风险 | Low | Medium-Low | Low | High | High | High |
-| 最佳市况 | 任何市况 | 震荡行情 | 存借利差为正 | Meme 行情活跃 | 聪明钱活跃期 | Pump.fun 热潮期 |
-| 最小资金 | ~$500 (ETH) | ~$50 | ~$100 (Arb) | ~0.5 SOL | ~0.3 SOL | ~0.2 SOL |
-| 需要的密钥 | EVM_PRIVATE_KEY | EVM_PRIVATE_KEY + OKX API | EVM_PRIVATE_KEY | SOL 私钥 + OKX API | SOL 私钥 + OKX API | SOL 私钥 + OKX API |
-| 运行方式 | 后台守护进程 | 后台守护进程 | AI 引导执行 | 后台守护进程 | 后台守护进程 | 后台守护进程 |
-| CLI 命令 | `strategy-auto-rebalance` | `strategy-grid` | `skills-store aave` | `strategy-ranking-sniper` | `strategy-signal-tracker` | `strategy-memepump-scanner` |
-
-## Authentication Requirements
-
-| 策略 | 环境变量 | 说明 |
-|------|---------|------|
-| A | `EVM_PRIVATE_KEY` | 用于签署链上交易 |
-| A (可选) | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Telegram 通知 |
-| B | `EVM_PRIVATE_KEY` | 用于签署链上交易 |
-| B | `OKX_API_KEY` + `OKX_SECRET_KEY` + `OKX_PASSPHRASE` | OKX DEX 聚合器 API |
-| B (可选) | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Telegram 通知 |
-| C | `EVM_PRIVATE_KEY` | 用于签署 Aave supply/borrow 交易 |
-| D/E/F | `SOL_PRIVATE_KEY` | Solana 钱包私钥，用于链上交易 |
-| D/E/F | `OKX_API_KEY` + `OKX_SECRET_KEY` + `OKX_PASSPHRASE` | OKX DEX API（报价 + swap） |
-
-If user hasn't set up keys, guide them:
-
-```
-需要先配置环境变量。在 .env 文件中添加：
-
-# EVM 策略 (A/B/C) — 钱包私钥
-EVM_PRIVATE_KEY=0x...
-
-# Solana 策略 (D/E/F) — 钱包私钥
-SOL_PRIVATE_KEY=...
-
-# 策略 B/D/E/F 需要 — OKX API
-OKX_API_KEY=...
-OKX_SECRET_KEY=...
-OKX_PASSPHRASE=...
-
-# 可选 — Telegram 通知
-TELEGRAM_BOT_TOKEN=...
-TELEGRAM_CHAT_ID=...
-```
-
-## Edge Cases
-
-| Scenario | Behavior |
-|---|---|
-| User asks for both strategies | Guide to run both in separate terminals |
-| User has no USDC | Suggest using `skills-store uniswap swap` to swap first |
-| User has no ETH on Base | Suggest bridging or swapping |
-| EVM_PRIVATE_KEY not set | Show setup instructions before launching |
-| User asks about other strategies (funding rate, sUSDe loop) | These are not yet built-in — guide user through the steps using individual `skills-store` commands (`skills-store aave`, `skills-store hyperliquid`, `skills-store ethena`) |
-| Aave 利差为负 (borrow > supply) | Strategy C 不可执行，建议策略 A 或等待利率回归 |
-| 健康因子过低 | 策略 C 循环时自动停止（HF < 1.30），提醒用户去杠杆 |
-| User just installed dapp-composer with no follow-up | Show Post-Install Welcome listing all skills |
-| User asks "你能做什么" / "what can you do" / "有什么 skill" | Show Post-Install Welcome listing all skills |
-| User asks about a specific dApp platform | Route to the corresponding `skills-store <dapp>` command directly |
-| User asks "支持哪些平台/协议" | Show the dApp platform table |
-| User says "哪个更好" | Use the comparison table; recommend A for conservative, D/E/F for aggressive Meme 玩家 |
-| User has very small capital (<$50) | Recommend B on Base (low gas) or D/E/F on Solana (小额测试) |
-| User has large capital (>$10k) | Recommend A on Ethereum (higher TVL, deeper liquidity) |
-| User asks about Solana Meme 策略 | Show D/E/F options, explain each strategy's signal source differs |
-| skills-store 未安装 | 引导安装: `curl -sSL .../install.sh \| sh` |
-| SOL_PRIVATE_KEY not set | Show setup instructions, warn about Meme 币高风险 |
-| User asks "哪个 Solana 策略更好" | D 最稳（榜单动量）、E 最聪明（跟单）、F 最激进（Pump.fun），建议小额分散测试 |
-
----
-
-# dApp CLI References (Built-in)
-
-The following dApp commands are all available via the `skills-store` binary after running the Pre-flight Check above.
-
----
-
-## [Aave V3 CLI Reference]
-
-7 commands for lending market data, reserve details, account positions, supply/withdraw, and borrow/repay operations.
-
-### Authentication
-
-- **Data commands** (`markets`, `reserve`, `account`): No auth needed.
-- **Transaction commands** (`supply`, `withdraw`, `borrow`, `repay`): Require `EVM_PRIVATE_KEY` in `.env`.
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store aave markets --chain <chain>` | No | List all Aave V3 reserve markets |
-| 2 | `skills-store aave reserve <symbol> --chain <chain>` | No | Get reserve APY, liquidity, config |
-| 3 | `skills-store aave account <address> --chain <chain>` | No | View positions, health factor, borrowing power |
-| 4 | `skills-store aave supply --token <symbol> --amount <n> --chain <chain>` | Yes | Supply assets to earn yield |
-| 5 | `skills-store aave withdraw --token <symbol> --amount <n\|max> --chain <chain>` | Yes | Withdraw supplied assets |
-| 6 | `skills-store aave borrow --token <symbol> --amount <n> --chain <chain>` | Yes | Borrow against collateral |
-| 7 | `skills-store aave repay --token <symbol> --amount <n\|max> --chain <chain>` | Yes | Repay borrowed assets |
-
-**Supported chains:** ethereum, polygon, arbitrum, base
-
-### Key Concepts
-
-- **Health Factor**: Must stay > 1.0 or position is liquidatable. Recommended > 1.5.
-- **aTokens**: Receipt tokens received when supplying (e.g. supply USDC → receive aUSDC). Balance grows automatically.
-- **LTV**: Max borrow value as % of collateral value (e.g. 80% LTV = borrow up to 80% of collateral).
-- **Use `max`** for full withdrawal or full repayment.
-
-### Quickstart
-
-```bash
-skills-store aave markets --chain ethereum
-skills-store aave reserve USDC --chain ethereum
-skills-store aave account 0xYourAddress --chain ethereum
-skills-store aave supply --token USDC --amount 100 --chain ethereum
-skills-store aave withdraw --token USDC --amount max --chain ethereum
-skills-store aave borrow --token USDC --amount 500 --chain ethereum
-skills-store aave repay --token USDC --amount max --chain ethereum
-```
-
-### Edge Cases
-
-- Health factor risk: warn if resulting HF < 1.5 after withdraw/borrow.
-- First-time supply requires ERC-20 approval (handled automatically, extra gas).
-- Use `--amount max` to repay full debt including accrued interest.
-- Unsupported chain → error listing supported chains.
-
----
-
-## [Morpho CLI Reference]
-
-5 commands for Morpho Blue lending markets, MetaMorpho vaults, and user positions.
-
-### Authentication
-
-- **All query commands** (`markets`, `market`, `vaults`, `vault`, `positions`): No auth needed.
-- **On-chain vault operations** (deposit/withdraw): Require `EVM_PRIVATE_KEY` in `.env`.
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store morpho markets [--chain <chain>] [--order-by <field>] [--direction <dir>]` | No | List Morpho Blue markets with APY and TVL |
-| 2 | `skills-store morpho market <unique_key> [--chain-id <id>]` | No | Get detailed market data |
-| 3 | `skills-store morpho vaults [--chain <chain>] [--order-by <field>] [--direction <dir>]` | No | List MetaMorpho vaults |
-| 4 | `skills-store morpho vault <address> [--chain-id <id>]` | No | Get detailed vault data |
-| 5 | `skills-store morpho positions <address> [--chain <chain>]` | No | View wallet positions |
-
-**Supported chains:** ethereum, base, arbitrum, optimism, polygon  
-**Chain IDs:** 1=Ethereum, 8453=Base, 42161=Arbitrum, 10=Optimism, 137=Polygon  
-**Order-by (markets):** SupplyAssetsUsd, BorrowAssetsUsd, Utilization, SupplyApy, BorrowApy  
-**Order-by (vaults):** TotalAssetsUsd, TotalAssets, Apy, NetApy, Name
-
-### Key Concepts
-
-- **Morpho Blue**: Permissionless isolated lending markets — each market has its own params, no shared risk.
-- **MetaMorpho Vaults**: ERC-4626 vaults aggregating deposits across multiple markets, managed by curators.
-- **Net APY vs Gross APY**: Net APY subtracts the vault's performance fee. Always compare using Net APY.
-- **Unique Key**: 32-byte hex identifying a Morpho Blue market — use for `market` command.
-
-### Quickstart
-
-```bash
-skills-store morpho markets --chain base --order-by SupplyApy --direction Desc
-skills-store morpho market 0xb323...86cc --chain-id 1
-skills-store morpho vaults --chain ethereum --order-by NetApy --direction Desc
-skills-store morpho vault 0xBEEF...F378 --chain-id 1
-skills-store morpho positions 0xYourAddress --chain base
-```
-
----
-
-## [Uniswap CLI Reference]
-
-3 commands for swap quotes, swap execution, and token lookup on Uniswap V3.
-
-### Authentication
-
-- **`tokens`**: No auth needed.
-- **`quote`**: Requires `EVM_PRIVATE_KEY` (reads on-chain QuoterV2 contract — no gas spent).
-- **`swap`**: Requires `EVM_PRIVATE_KEY` (signs and broadcasts transaction).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store uniswap quote --from <token> --to <token> --amount <n> [--chain <chain>] [--fee <bps>]` | Yes* | Get estimated swap output without executing |
-| 2 | `skills-store uniswap swap --from <token> --to <token> --amount <n> [--chain <chain>] [--fee <bps>] [--slippage <bps>]` | Yes | Execute on-chain swap |
-| 3 | `skills-store uniswap tokens [--chain <chain>]` | No | List well-known token symbols and addresses |
-
-**Supported chains:** arbitrum (default), ethereum, polygon  
-**Fee tiers:** 100 (0.01%), 500 (0.05%), 3000 (0.3%), 10000 (1%)  
-**Default slippage:** 50 bps (0.5%)
-
-### Available Tokens
-
-| Chain | Tokens |
-|---|---|
-| Arbitrum | WETH, USDC, USDC.e, USDT, wstETH, weETH, WBTC, ARB |
-| Ethereum | WETH, USDC, USDT, wstETH, weETH, WBTC, DAI, sUSDe, USDe |
-| Polygon | WETH, USDC, USDT, WMATIC, wstETH |
-
-### Key Concepts
-
-- **Fee Tiers**: Correlated pairs (WETH/wstETH) use 100 bps; standard pairs (WETH/USDC) use 3000 bps.
-- **Slippage**: Default 50 bps. For large/illiquid swaps, use `--slippage 100` or higher.
-- **ERC-20 Approval**: First swap of a token requires approval (auto-handled, extra gas).
-- **Unknown token**: Use contract address `0x...` directly if symbol not in well-known list.
-
-### Quickstart
-
-```bash
-skills-store uniswap tokens --chain arbitrum
-skills-store uniswap quote --from WETH --to wstETH --amount 0.05
-skills-store uniswap swap --from WETH --to wstETH --amount 0.05
-skills-store uniswap swap --from USDC --to WETH --amount 100 --chain ethereum --fee 3000
-```
-
----
-
-## [Hyperliquid CLI Reference]
-
-11 commands for perpetual futures and spot trading on Hyperliquid.
-
-### Authentication
-
-- **Data commands** (`markets`, `spot-markets`, `price`, `orderbook`, `funding`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `positions`, `balances`, `orders`): Require `EVM_PRIVATE_KEY` in `.env` (signs EIP-712 typed data for Hyperliquid L1).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store hyperliquid markets` | No | List perpetual markets (price, leverage, volume) |
-| 2 | `skills-store hyperliquid spot-markets` | No | List spot markets |
-| 3 | `skills-store hyperliquid price <symbol>` | No | Real-time mid price |
-| 4 | `skills-store hyperliquid orderbook <symbol>` | No | L2 order book snapshot |
-| 5 | `skills-store hyperliquid funding <symbol>` | No | Current and historical funding rates |
-| 6 | `skills-store hyperliquid buy --symbol <s> --size <n> --price <p> [--leverage <l>]` | Yes | Buy / open long |
-| 7 | `skills-store hyperliquid sell --symbol <s> --size <n> --price <p>` | Yes | Sell / open short |
-| 8 | `skills-store hyperliquid cancel --symbol <s> --order-id <oid>` | Yes | Cancel an open order |
-| 9 | `skills-store hyperliquid positions` | Yes | View perpetual positions |
-| 10 | `skills-store hyperliquid balances` | Yes | View USDC margin and spot balances |
-| 11 | `skills-store hyperliquid orders [--symbol <s>]` | Yes | List open orders |
-
-### Key Concepts
-
-- **Funding Rate**: Hourly payment between longs/shorts. Positive = longs pay shorts.
-- **Cross Margin**: All positions share the same USDC margin pool.
-- **szDecimals**: Each asset has required size precision (e.g. BTC = 5 decimal places). Use `markets` to check.
-- **Liquidation Price**: Monitor closely — cross margin means losses in one position affect all others.
-
-### Quickstart
-
-```bash
-skills-store hyperliquid markets
-skills-store hyperliquid funding BTC
-skills-store hyperliquid price BTC
-skills-store hyperliquid buy --symbol BTC --size 0.01 --price 65000 --leverage 10
-skills-store hyperliquid positions
-skills-store hyperliquid sell --symbol BTC --size 0.01 --price 66000
-```
-
----
-
-## [Ethena CLI Reference]
-
-5 commands for sUSDe yield-bearing stablecoin on Ethereum mainnet.
-
-### Authentication
-
-- **`apy`, `balance`**: No auth needed.
-- **`stake`, `cooldown`, `unstake`**: Require `EVM_PRIVATE_KEY` in `.env` (Ethereum mainnet, ETH for gas).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store ethena apy` | No | sUSDe exchange rate, total assets, cooldown duration |
-| 2 | `skills-store ethena balance <address>` | No | USDe and sUSDe balances for a wallet |
-| 3 | `skills-store ethena stake --amount <n>` | Yes | Deposit USDe → receive sUSDe shares |
-| 4 | `skills-store ethena cooldown --amount <n>` | Yes | Initiate 7-day unstake cooldown (amount in USDe terms) |
-| 5 | `skills-store ethena unstake` | Yes | Withdraw USDe after cooldown completes |
-
-### Key Concepts
-
-- **Exchange Rate**: 1 sUSDe = X USDe (grows over time as yield accrues).
-- **Cooldown Period**: 7 days. Must call `cooldown` first, wait 7 days, then call `unstake`.
-- **Yield Source**: Ethena delta-neutral strategy (spot ETH + short perp) distributes funding income to sUSDe holders. APY ~8–15% historically.
-- **sUSDe on L2**: Can buy sUSDe on L2 DEXes (cheaper gas), but staking/unstaking only on Ethereum mainnet.
-
-### Quickstart
-
-```bash
-skills-store ethena apy
-skills-store ethena balance 0xYourAddress
-skills-store ethena stake --amount 1000
-skills-store ethena cooldown --amount 500
-skills-store ethena unstake
-```
-
----
-
-## [Polymarket CLI Reference]
-
-12 commands for prediction market search, pricing, and trading on Polygon.
-
-### Authentication
-
-- **Data commands** (`search`, `markets`, `event`, `price`, `book`, `history`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `orders`, `positions`, `balance`): Require `EVM_PRIVATE_KEY` in `.env` (Polygon wallet). API credentials auto-derived and cached at `~/.skills-store/polymarket_creds.json`.
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store polymarket search <query> [--limit <n>]` | No | Search prediction markets |
-| 2 | `skills-store polymarket markets [--tag <tag>] [--sort <sort>] [--limit <n>]` | No | List popular/active markets |
-| 3 | `skills-store polymarket event <event_id>` | No | Get event details with related markets |
-| 4 | `skills-store polymarket price <token_id>` | No | Get Yes/No price, midpoint, spread |
-| 5 | `skills-store polymarket book <token_id>` | No | View orderbook depth |
-| 6 | `skills-store polymarket history <token_id> [--interval <1m\|1h\|1d\|1w>]` | No | Price history |
-| 7 | `skills-store polymarket buy --token <id> --amount <usdc> --price <0-1>` | Yes | Buy outcome shares |
-| 8 | `skills-store polymarket sell --token <id> --amount <shares> --price <0-1>` | Yes | Sell outcome shares |
-| 9 | `skills-store polymarket cancel <order_id>` | Yes | Cancel an open order |
-| 10 | `skills-store polymarket orders [--market <id>]` | Yes | View open orders |
-| 11 | `skills-store polymarket positions` | Yes | View current positions |
-| 12 | `skills-store polymarket balance` | Yes | View USDC balance |
-
-### Key Concepts
-
-- **Prices are probabilities**: Price 0.65 = 65% implied probability. Win pays $1.00 per share.
-- **Two token IDs per market**: `clobTokenIds[0]` = Yes, `clobTokenIds[1]` = No.
-- **CLOB model**: Central limit order book — orders may not fill immediately.
-- **USDC on Polygon**: All trading uses USDC on Polygon network.
-
-### Quickstart
-
-```bash
-skills-store polymarket markets --sort volume --limit 10
-skills-store polymarket search "bitcoin"
-skills-store polymarket price <token_id>
-skills-store polymarket buy --token <token_id> --amount 100 --price 0.65
-skills-store polymarket positions
-```
-
----
-
-## [Kalshi CLI Reference]
-
-12 commands for US-regulated prediction market trading across demo and production environments.
-
-### Authentication
-
-- **Data commands** (`search`, `markets`, `event`, `price`, `book`, `history`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `orders`, `positions`, `balance`): Require Kalshi RSA API credentials:
-  ```bash
-  KALSHI_KEY_ID=your-key-id
-  KALSHI_PRIVATE_KEY_PEM=/path/to/private_key.pem
-  ```
-  Get API keys at: https://kalshi.com/profile/api-keys
-
-**Important:** Default environment is `demo` (paper trading). Use `--env prod` for real trades. KYC required for production (US residents only).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `skills-store kalshi [--env demo\|prod] search <query>` | No | Search events and markets |
-| 2 | `skills-store kalshi [--env demo\|prod] markets [--sort <sort>] [--limit <n>]` | No | List popular/active markets |
-| 3 | `skills-store kalshi [--env demo\|prod] event <event_ticker>` | No | Get event with related markets |
-| 4 | `skills-store kalshi [--env demo\|prod] price <ticker>` | No | Get Yes/No price and probability |
-| 5 | `skills-store kalshi [--env demo\|prod] book <ticker>` | No | View orderbook depth |
-| 6 | `skills-store kalshi [--env demo\|prod] history <ticker> [--interval <1m\|1h\|1d\|1w>]` | No | Price history |
-| 7 | `skills-store kalshi [--env demo\|prod] buy --ticker <t> --side <yes\|no> --count <n> --price <0-1>` | Yes | Buy outcome contracts |
-| 8 | `skills-store kalshi [--env demo\|prod] sell --ticker <t> --side <yes\|no> --count <n> --price <0-1>` | Yes | Sell outcome contracts |
-| 9 | `skills-store kalshi [--env demo\|prod] cancel <order_id>` | Yes | Cancel an open order |
-| 10 | `skills-store kalshi [--env demo\|prod] orders [--ticker <t>]` | Yes | View open orders |
-| 11 | `skills-store kalshi [--env demo\|prod] positions` | Yes | View current positions |
-| 12 | `skills-store kalshi [--env demo\|prod] balance` | Yes | View USD account balance |
-
-### Key Concepts
-
-- **Prices in cents**: Price 65 = 65% probability. Buy Yes at 65 cents → pay $0.65/contract, win $1.00 if Yes.
-- **Count vs Amount**: Specify `--count` (number of contracts), not a USD amount. Each contract = $1 face value.
-- **Demo first**: Always test with `--env demo` before using `--env prod`.
-- **Kalshi vs Polymarket**: Kalshi = US licensed, KYC required, USD. Polymarket = decentralized, no KYC, USDC on Polygon.
-
-### Quickstart
-
-```bash
-skills-store kalshi markets
-skills-store kalshi search "fed rate"
-skills-store kalshi price FED-24DEC-T5.25
-skills-store kalshi buy --ticker FED-24DEC-T5.25 --side yes --count 10 --price 0.65
-skills-store kalshi --env prod buy --ticker FED-24DEC-T5.25 --side yes --count 10 --price 0.65
-```
+- 成功 → 继续下一步
+- 失败 → 告知用户安装失败，检查网络
