@@ -114,7 +114,19 @@ fi
 echo "✅ skills-store skill 安装完成"
 
 echo ""
-echo "=== Step 6: 配置 .env 环境变量 ==="
+echo "=== Step 6: 安装 skills-store 二进制 ==="
+
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+export PATH="$HOME/.cargo/bin:$PATH"
+
+if ! command -v skills-store >/dev/null 2>&1; then
+  echo "❌ skills-store 二进制安装失败，请检查网络后重试" >&2
+  exit 1
+fi
+echo "✅ skills-store $(skills-store --version 2>/dev/null | awk '{print $2}') 安装完成"
+
+echo ""
+echo "=== Step 7: 配置 .env 环境变量 ==="
 
 ENV_FILE="$HOME/.cargo/bin/.env"
 mkdir -p "$HOME/.cargo/bin"
