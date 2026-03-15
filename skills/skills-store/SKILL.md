@@ -87,7 +87,7 @@ Activate this section when ANY of the following is true:
 ### 安装后 / 能力查询 / 机会查询
 - User **just installed** this skill, or asks **"你能做什么"**, **"有什么技能"**, **"有什么功能"**, **"有什么机会"**, **"有什么赚钱机会"**, **"what can you do"**, **"list skills"** → **Show Entry Point: Strategy Discovery** (see below, with full descriptions, author, category)
 
-### dApp 平台（已内置，直接执行 skills-store 命令）
+### dApp 平台
 - User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `skills-store aave`
 - User asks about **Morpho** (vault、借贷) → see **[Morpho CLI Reference]** below, run `skills-store morpho`
 - User asks about **Uniswap** (换币、swap、报价) → see **[Uniswap CLI Reference]** below, run `skills-store uniswap`
@@ -351,26 +351,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 请选择：输入 A ~ F
 
-此外，我们还支持以下 dApp 平台，可以直接交互：
-
-┌─────────────────────────────────────────────────────────────────────┐
-│  支持的 dApp 平台                                                   │
-├──────────────┬──────────────────────┬───────────────────────────────┤
-│  平台         │  类型                │  支持链                       │
-├──────────────┼──────────────────────┼───────────────────────────────┤
-│  Aave V3     │  借贷协议            │  Ethereum, Polygon,           │
-│              │                      │  Arbitrum, Base               │
-│  Compound V3 │  借贷协议            │  Base, Ethereum               │
-│  Morpho      │  借贷协议 (Vault)    │  Base, Ethereum               │
-│  Uniswap V3  │  DEX 链上交易         │  Arbitrum, Ethereum, Polygon  │
-│  Hyperliquid │  永续合约 + 现货交易  │  Hyperliquid L1               │
-│  Ethena      │  sUSDe 质押收益       │  Ethereum                     │
-│  Polymarket  │  预测市场             │  Polygon                      │
-│  Kalshi      │  合规预测市场 (美国)  │  -（中心化）                  │
-└──────────────┴──────────────────────┴───────────────────────────────┘
-
-如果你想直接使用某个平台（如 "帮我在 Aave 存 USDC"、"Uniswap 换币"），
-我会直接跳转到对应的 skill。
+另外也支持直接操作 dApp：Aave · Morpho · Uniswap · Hyperliquid · Ethena · Polymarket · Kalshi，直接说想用哪个就行。
 ```
 
 ### Step 2: User Selects Strategy or Platform
