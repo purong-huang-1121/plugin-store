@@ -1,5 +1,5 @@
 ---
-name: dapp-composer
+name: skills-store
 description: >-
   This is the main on-chain DeFi skill. Use it for ALL of the following:
 
@@ -65,51 +65,46 @@ Activate this section when ANY of the following is true:
 Present the following welcome message:
 
 ```
-你好！我支持以下能力，每个能力都是一个独立的 skill，可按需安装：
+你好！除了内置的链上操作能力，我们还提供 5 个自动化策略——
+帮你真正实现链上躺赚，无需手动盯盘：
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📦 dApp 技能（已内置，直接可用）
+  🤖 推荐安装：自动化策略技能
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  • dapp-aave        Aave V3 借贷 — 存款、借款、还款、查利率
-  • dapp-morpho      Morpho 借贷 — Vault 管理、借贷市场
-  • dapp-uniswap     Uniswap V3 — 链上 swap、报价
-  • dapp-hyperliquid 永续合约 + 现货 — 开平仓、funding rate
-  • dapp-ethena      sUSDe 质押收益
-  • dapp-polymarket  预测市场下注
-  • dapp-kalshi      合规预测市场（美国）
+  A. USDC 智能调仓             ⭐ 低风险 · 稳定收益
+     分类：DeFi · 套利  |  作者：徐易朗 (yilang.xu@okg.com)
+     自动在 Aave/Compound/Morpho 间轮动最高收益
+     预估年化 3%~8%，稳定币无币价风险，全自动守护进程
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🤖 自动化策略技能（需单独安装）
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  B. ETH/USDC 网格交易         ⭐⭐ 中低风险 · 震荡收益
+     分类：DeFi · 交易  |  作者：单杰 (jie.shan@okg.com)
+     震荡行情自动低买高卖
+     预估年化 10%~30%，自适应波动率，Base 链极低 gas
 
-  A. strategy-auto-rebalance   ⭐ 低风险
-     USDC 智能调仓 — 自动在 Aave/Compound/Morpho 间寻找最优收益
-     支持链：Base、Ethereum | 预估年化：3%~8%
+  C. SOL 涨幅榜狙击            ⭐⭐⭐ 高风险 · SOL 动量
+     分类：MEME交易  |  作者：Suning Yao (suning.yao@okg.com)
+     新币上榜自动买入，跌出自动卖出
+     25 项安全检查 + 6 层退出机制
 
-  B. strategy-grid-trade       ⭐⭐ 中低风险
-     ETH/USDC 网格交易 — 震荡行情自动低买高卖
-     支持链：Base | 预估年化：10%~30%
+  D. SOL 聪明钱跟单            ⭐⭐⭐ 高风险 · 聪明钱
+     分类：MEME交易  |  作者：Ray Zhou & Cai Shuai
+     跟随 SmartMoney/KOL/Whale 信号
+     多重风控 + Session 连亏熔断保护
 
-  C. strategy-ranking-sniper   ⭐⭐⭐ 高风险
-     SOL 涨幅榜狙击 — 实时监控榜单动量自动买入
-     支持链：Solana | 每 10 秒轮询，25 项风控
-
-  D. strategy-signal-tracker   ⭐⭐⭐ 高风险
-     SOL 聪明钱跟单 — 跟随 SmartMoney/KOL/Whale 信号
-     支持链：Solana | 分级仓位 + Session 风控
-
-  E. strategy-memepump-scanner ⭐⭐⭐ 高风险
-     SOL Memepump 扫描 — 捕捉 Pump.fun 迁移后动量爆发
-     支持链：Solana | 三重信号检测
+  E. SOL Memepump 扫描         ⭐⭐⭐ 高风险 · Meme 动量
+     分类：MEME交易  |  作者：Victor Lee (victor.lee@okg.com)
+     捕捉 Pump.fun 迁移后动量爆发
+     三重信号共振，30min 最大持仓保护
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-安装任意策略技能（示例）：
-  /install strategy-auto-rebalance
-  /install strategy-grid-trade
+告诉我你感兴趣的策略，我来帮你安装（支持同时安装多个）。
 
-想了解某个策略的详情，或直接告诉我你想做什么，我来帮你选择！
+─────────────────────────────────────────────────────
+已内置协议操作（直接告诉我想用哪个即可）：
+Aave 借贷 · Morpho · Uniswap swap · Hyperliquid 合约
+Ethena sUSDe · Polymarket · Kalshi
 ```
 
 After presenting the welcome message, wait for the user's response. Do NOT immediately ask follow-up questions — let the user lead.
@@ -141,6 +136,23 @@ Same as sub-skills. Run once per session:
 ### 自动化策略
 - User asks about **grid trading specifically** → use `plugin-store grid`
 - User asks about **USDC yield / auto-rebalance specifically** → use `plugin-store auto-rebalance`
+
+### 策略安装（重要）
+
+当用户表达想要使用某个策略时（如"我要用网格交易"、"安装聪明钱跟单"、"我想试试涨幅榜狙击"、"我要用A和C"等），**直接执行对应的安装命令**，无需再次询问确认：
+
+| 用户意图 | 执行命令 |
+|---|---|
+| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance` |
+| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade` |
+| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper` |
+| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker` |
+| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner` |
+
+如果用户想安装**多个策略**，用空格分隔 skill 名称：
+```bash
+npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade strategy-signal-tracker
+```
 
 ### 策略发现（本 skill）
 - User asks **"有什么赚钱/盈利/套利机会"** or general strategy discovery → **use this skill**

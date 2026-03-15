@@ -18,7 +18,7 @@ set -e
 #   Linux  : x86_64, i686, aarch64, armv7l
 # ──────────────────────────────────────────────────────────────
 
-REPO="okx/plugin-store"
+REPO="purong-huang-1121/skills-store"
 BINARY="plugin-store"
 INSTALL_DIR="$HOME/.local/bin"
 CACHE_DIR="$INSTALL_DIR/.plugin-store"

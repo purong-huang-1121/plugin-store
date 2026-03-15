@@ -5,7 +5,9 @@ version: 1.0.0
 updated: 2026-03-15
 license: Apache-2.0
 metadata:
-  author: okx
+  author: Suning Yao (suning.yao@okg.com)
+  category: "MEME交易"
+  chain: Solana
   version: "1.0.0"
   homepage: "https://web3.okx.com"
 ---

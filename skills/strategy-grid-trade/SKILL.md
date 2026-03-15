@@ -3,7 +3,9 @@ name: strategy-grid-trade
 description: "Use when the user asks about grid trading, ETH/USDC bot, automated trading on Base, grid bot status, trade history, PnL report, or mentions running/stopping/monitoring the grid bot. Covers: grid tick execution, start/stop daemon, status/report/history, market analysis, deposit tracking, retry failed trades. Do NOT use for manual token swaps or DeFi lending — use strategy-auto-rebalance for yield optimization."
 license: Apache-2.0
 metadata:
-  author: okx
+  author: 单杰 (jie.shan@okg.com)
+  category: "DeFi · 交易"
+  chain: Base
   version: "2.0.0"
   homepage: "https://web3.okx.com"
 ---

@@ -5,7 +5,9 @@ version: 2.4.1
 updated: 2026-03-13
 license: Apache-2.0
 metadata:
-  author: okx
+  author: Victor Lee (victor.lee@okg.com)
+  category: "MEME交易"
+  chain: Solana
   version: "2.4.1"
   homepage: "https://web3.okx.com"
 ---

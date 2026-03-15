@@ -5,7 +5,11 @@ version: 3.0.0
 updated: 2026-03-14
 license: Apache-2.0
 metadata:
-  author: okx
+  authors:
+    - Ray Zhou (ruixiang.zhou@okg.com)
+    - Cai Shuai (shuai.cai@okg.com)
+  category: "MEME交易"
+  chain: Solana
   version: "3.0.0"
   homepage: "https://web3.okx.com"
 ---
