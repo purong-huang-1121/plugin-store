@@ -62,52 +62,7 @@ Activate this section when ANY of the following is true:
 
 ### Response
 
-Present the following welcome message:
-
-```
-你好！除了内置的链上操作能力，我们还提供 5 个自动化策略——
-帮你真正实现链上躺赚，无需手动盯盘：
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  🤖 推荐安装：自动化策略技能
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  A. USDC 智能调仓             ⭐ 低风险 · 稳定收益
-     分类：DeFi · 套利  |  作者：徐易朗 (yilang.xu@okg.com)
-     自动在 Aave/Compound/Morpho 间轮动最高收益
-     预估年化 3%~8%，稳定币无币价风险，全自动守护进程
-
-  B. ETH/USDC 网格交易         ⭐⭐ 中低风险 · 震荡收益
-     分类：DeFi · 交易  |  作者：单杰 (jie.shan@okg.com)
-     震荡行情自动低买高卖
-     预估年化 10%~30%，自适应波动率，Base 链极低 gas
-
-  C. SOL 涨幅榜狙击            ⭐⭐⭐ 高风险 · SOL 动量
-     分类：MEME交易  |  作者：Suning Yao (suning.yao@okg.com)
-     新币上榜自动买入，跌出自动卖出
-     25 项安全检查 + 6 层退出机制
-
-  D. SOL 聪明钱跟单            ⭐⭐⭐ 高风险 · 聪明钱
-     分类：MEME交易  |  作者：Ray Zhou & Cai Shuai
-     跟随 SmartMoney/KOL/Whale 信号
-     多重风控 + Session 连亏熔断保护
-
-  E. SOL Memepump 扫描         ⭐⭐⭐ 高风险 · Meme 动量
-     分类：MEME交易  |  作者：Victor Lee (victor.lee@okg.com)
-     捕捉 Pump.fun 迁移后动量爆发
-     三重信号共振，30min 最大持仓保护
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-告诉我你感兴趣的策略，我来帮你安装（支持同时安装多个）。
-
-─────────────────────────────────────────────────────
-已内置协议操作（直接告诉我想用哪个即可）：
-Aave 借贷 · Morpho · Uniswap swap · Hyperliquid 合约
-Ethena sUSDe · Polymarket · Kalshi
-```
-
-After presenting the welcome message, wait for the user's response. Do NOT immediately ask follow-up questions — let the user lead.
+→ 直接展示下方 **Entry Point: Strategy Discovery** 的完整内容（含描述、作者、分类）。
 
 ## Pre-flight Checks
 
@@ -132,8 +87,8 @@ which skills-store
 
 ## Skill Routing
 
-### 安装后 / 能力查询
-- User **just installed** this skill, or asks **"你能做什么"**, **"有什么技能"**, **"支持哪些策略"**, **"what can you do"**, **"list skills"** → **Show Post-Install Welcome** (see above)
+### 安装后 / 能力查询 / 机会查询
+- User **just installed** this skill, or asks **"你能做什么"**, **"有什么技能"**, **"有什么功能"**, **"有什么机会"**, **"有什么赚钱机会"**, **"what can you do"**, **"list skills"** → **Show Entry Point: Strategy Discovery** (see below, with full descriptions, author, category)
 
 ### dApp 平台（已内置，直接执行 skills-store 命令）
 - User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `skills-store aave`
@@ -280,8 +235,8 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 如果用户使用的是 Claude Code（命令行），无需重启，skill 立即生效。
 
-### 策略发现（本 skill）
-- User asks **"有什么赚钱/盈利/套利机会"** or general strategy discovery → **use this skill**
+### 策略发现 / 能力查询（本 skill）
+- User asks **"有什么赚钱/盈利/套利机会"**, **"你能做什么"**, **"有什么功能"**, **"有什么能力"** or any discovery query → **use this skill → Entry Point: Strategy Discovery**
 
 ---
 
@@ -289,7 +244,11 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 ### Trigger
 
-User says: "链上有什么赚钱机会", "有什么盈利机会", "有什么套利机会", "有什么好的策略", "how to earn on-chain", "any profitable strategies", "帮我理财", "yield opportunities", "automated strategies"
+以下任意一类问题均触发此 section，**必须展示完整的策略列表（含描述、作者、分类）**：
+
+- **能力/功能查询**："你能做什么"、"你有什么能力"、"都有什么功能"、"你支持什么"、"有什么技能"、"支持哪些策略"、"what can you do"、"list skills"、"show me all strategies"
+- **机会/收益查询**："链上有什么赚钱机会"、"有什么盈利机会"、"有什么套利机会"、"有什么好的策略"、"帮我理财"、"有什么收益机会"、"yield opportunities"、"how to earn on-chain"、"any profitable strategies"、"automated strategies"
+- **刚安装完**：用户没有提具体问题时
 
 ### Step 1: Present Built-in Strategies and Supported Platforms
 
