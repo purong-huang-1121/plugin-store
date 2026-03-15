@@ -69,13 +69,23 @@ else
   echo "❌ npx 未安装（需要 Node.js），尝试安装..."
   if command -v brew >/dev/null 2>&1; then
     brew install node
+    # 将 Homebrew bin 加入当前会话 PATH（Apple Silicon: /opt/homebrew/bin，Intel: /usr/local/bin）
+    BREW_PREFIX=$(brew --prefix 2>/dev/null || echo "/usr/local")
+    export PATH="$BREW_PREFIX/bin:$PATH"
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install -y nodejs npm
   else
     echo "无法自动安装 npx，请先安装 Node.js：https://nodejs.org" >&2
     exit 1
   fi
-  echo "✅ npx 安装完成"
+  # 验证 npx 现在可用
+  if ! command -v npx >/dev/null 2>&1; then
+    echo "安装完成但 npx 仍未找到，请手动运行：" >&2
+    echo "  export PATH=\"\$(brew --prefix)/bin:\$PATH\"" >&2
+    echo "然后重新运行此脚本" >&2
+    exit 1
+  fi
+  echo "✅ npx 安装完成：$(npx --version)"
 fi
 
 echo ""
