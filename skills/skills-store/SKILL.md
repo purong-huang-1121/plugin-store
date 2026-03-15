@@ -223,16 +223,15 @@ TELEGRAM_CHAT_ID=你的ChatID
 如需帮助，直接告诉我你遇到的问题。
 ```
 
-**重要：安装后需要新建对话**
+**重要：安装后直接读取 Skill 文件继续引导**
 
-无论是 Claude 桌面版还是 Claude Code（命令行），新安装的 Skill 在**当前会话**中不会生效。安装完成后必须提醒：
+安装完成后，**无需重开会话**。直接读取对应的 SKILL.md 文件，按其内容继续引导用户：
 
+```bash
+cat ~/.claude/skills/<skill-name>/SKILL.md
 ```
-✅ 安装完成！
 
-⚠️  请重新开始一个新对话，新安装的策略 Skill 才会生效。
-新对话中直接说你想用的策略，Skill 会自动引导你完成配置和启动。
-```
+读取后按文件中的指令执行（Pre-flight → Post-Install Welcome → 引导配置）。
 
 ### 策略发现 / 能力查询（本 skill）
 - User asks **"有什么赚钱/盈利/套利机会"**, **"你能做什么"**, **"有什么功能"**, **"有什么能力"** or any discovery query → **use this skill → Entry Point: Strategy Discovery**
@@ -374,21 +373,15 @@ curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Step 3：完成安装，提示用户
+### Step 3：读取策略 Skill 并继续引导
 
-安装完成后，向用户展示：
+安装完成后，**立即读取策略 Skill 文件内容并按其指令继续引导用户**（无需重开会话）：
 
-```
-✅ strategy-auto-rebalance 安装完成！
-
-下一步：
-1. 配置环境变量（见上方 .env 示例，填写 EVM_PRIVATE_KEY）
-2. 重新开始一个新对话 —— 策略 Skill 将自动加载并引导你完成启动配置
-
-需要帮助配置 .env 的话，直接告诉我。
+```bash
+cat ~/.claude/skills/strategy-auto-rebalance/SKILL.md
 ```
 
-**不要在此 skill 里尝试运行 strategy-auto-rebalance 命令或调用策略 Skill，当前会话中新安装的 Skill 尚未加载。**
+读取成功后，按该文件中的 **Pre-flight Checks** → **Post-Install Welcome** 顺序继续执行，引导用户完成链选择、环境变量配置和启动。
 
 
 ## Flow B: ETH/USDC 网格交易
@@ -406,21 +399,15 @@ curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Step 3：完成安装，提示用户
+### Step 3：读取策略 Skill 并继续引导
 
-安装完成后，向用户展示：
+安装完成后，**立即读取策略 Skill 文件内容并按其指令继续引导用户**（无需重开会话）：
 
-```
-✅ strategy-grid-trade 安装完成！
-
-下一步：
-1. 配置环境变量（见上方 .env 示例，填写 OKX_API_KEY / EVM_PRIVATE_KEY）
-2. 重新开始一个新对话 —— 策略 Skill 将自动加载并引导你完成启动配置
-
-需要帮助配置 .env 的话，直接告诉我。
+```bash
+cat ~/.claude/skills/strategy-grid-trade/SKILL.md
 ```
 
-**不要在此 skill 里尝试运行 strategy-grid 命令或调用策略 Skill，当前会话中新安装的 Skill 尚未加载。**
+读取成功后，按该文件中的 **Pre-flight Checks** → **Post-Install Welcome** 顺序继续执行，引导用户完成链选择、环境变量配置和启动。
 
 
 ## Flow D: SOL 涨幅榜狙击 (Ranking Sniper)
@@ -438,21 +425,15 @@ curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Step 3：完成安装，提示用户
+### Step 3：读取策略 Skill 并继续引导
 
-安装完成后，向用户展示：
+安装完成后，**立即读取策略 Skill 文件内容并按其指令继续引导用户**（无需重开会话）：
 
-```
-✅ strategy-ranking-sniper 安装完成！
-
-下一步：
-1. 配置环境变量（见上方 .env 示例，填写 SOLANA_PRIVATE_KEY / OKX_API_KEY）
-2. 重新开始一个新对话 —— 策略 Skill 将自动加载并引导你完成启动配置
-
-需要帮助配置 .env 的话，直接告诉我。
+```bash
+cat ~/.claude/skills/strategy-ranking-sniper/SKILL.md
 ```
 
-**不要在此 skill 里尝试运行 strategy-ranking-sniper 命令或调用策略 Skill，当前会话中新安装的 Skill 尚未加载。**
+读取成功后，按该文件中的 **Pre-flight Checks** → **Post-Install Welcome** 顺序继续执行，引导用户完成环境变量配置和启动。
 
 
 ## Flow E: SOL 聪明钱跟单 (Signal Tracker)
@@ -470,21 +451,15 @@ curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Step 3：完成安装，提示用户
+### Step 3：读取策略 Skill 并继续引导
 
-安装完成后，向用户展示：
+安装完成后，**立即读取策略 Skill 文件内容并按其指令继续引导用户**（无需重开会话）：
 
-```
-✅ strategy-signal-tracker 安装完成！
-
-下一步：
-1. 配置环境变量（见上方 .env 示例，填写 SOLANA_PRIVATE_KEY / OKX_API_KEY）
-2. 重新开始一个新对话 —— 策略 Skill 将自动加载并引导你完成启动配置
-
-需要帮助配置 .env 的话，直接告诉我。
+```bash
+cat ~/.claude/skills/strategy-signal-tracker/SKILL.md
 ```
 
-**不要在此 skill 里尝试运行 strategy-signal-tracker 命令或调用策略 Skill，当前会话中新安装的 Skill 尚未加载。**
+读取成功后，按该文件中的 **Pre-flight Checks** → **Post-Install Welcome** 顺序继续执行，引导用户完成环境变量配置和启动。
 
 
 ## Flow F: SOL Memepump 扫描 (Memepump Scanner)
@@ -502,19 +477,13 @@ curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/
 export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
-### Step 3：完成安装，提示用户
+### Step 3：读取策略 Skill 并继续引导
 
-安装完成后，向用户展示：
+安装完成后，**立即读取策略 Skill 文件内容并按其指令继续引导用户**（无需重开会话）：
 
-```
-✅ strategy-memepump-scanner 安装完成！
-
-下一步：
-1. 配置环境变量（见上方 .env 示例，填写 SOLANA_PRIVATE_KEY / OKX_API_KEY）
-2. 重新开始一个新对话 —— 策略 Skill 将自动加载并引导你完成启动配置
-
-需要帮助配置 .env 的话，直接告诉我。
+```bash
+cat ~/.claude/skills/strategy-memepump-scanner/SKILL.md
 ```
 
-**不要在此 skill 里尝试运行 strategy-memepump-scanner 命令或调用策略 Skill，当前会话中新安装的 Skill 尚未加载。**
+读取成功后，按该文件中的 **Pre-flight Checks** → **Post-Install Welcome** 顺序继续执行，引导用户完成环境变量配置和启动。
 
