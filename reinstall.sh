@@ -1,6 +1,6 @@
 #!/bin/sh
 # reinstall.sh — 清理并重新安装 skills-store skill
-# Usage: curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/reinstall.sh | sh
+# Usage: curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/reinstall.sh -o /tmp/reinstall.sh && sh /tmp/reinstall.sh
 
 set -e
 
@@ -91,7 +91,7 @@ fi
 echo ""
 echo "=== Step 5: 安装 skills-store skill ==="
 
-npx skills add purong-huang-1121/skills-store --skill skills-store --yes </dev/tty
+npx skills add purong-huang-1121/skills-store --skill skills-store --yes
 SKILLS_EXIT=$?
 
 if [ $SKILLS_EXIT -ne 0 ]; then
@@ -168,20 +168,20 @@ elif [ "$(uname -s)" = "Darwin" ]; then
   echo ""
   echo "已用 TextEdit 打开 $ENV_FILE"
   echo "请填写环境变量后保存，然后按回车继续..."
-  read -r _ </dev/tty
+  read -r _
 elif command -v xdg-open >/dev/null 2>&1; then
   # Linux 桌面环境
   xdg-open "$ENV_FILE"
   echo ""
   echo "已打开 $ENV_FILE，请填写环境变量后保存，然后按回车继续..."
-  read -r _ </dev/tty
+  read -r _
 else
   echo ""
   echo "请手动编辑以下文件，填写环境变量后再继续："
   echo "  $ENV_FILE"
   echo ""
   echo "填写完成后按回车继续..."
-  read -r _ </dev/tty
+  read -r _
 fi
 
 echo ""
