@@ -118,18 +118,23 @@ install_binary() {
   tmpdir=$(mktemp -d)
   trap 'rm -rf "$tmpdir"' EXIT
 
-  # Download with retries (handles curl exit 18 partial transfer)
-  max_attempts=3
+  # Download with resume support — retries pick up from where they left off
+  max_attempts=5
   attempt=0
   while [ $attempt -lt $max_attempts ]; do
     attempt=$((attempt + 1))
-    if curl -sSfL --retry 2 --retry-delay 3 "$url" -o "$tmpdir/$binary_name"; then
+    # -C - resumes partial download; exit 33 means server doesn't support resume (start over)
+    if curl -fL --retry 1 -C - "$url" -o "$tmpdir/$binary_name" 2>&1; then
       break
     fi
-    if [ $attempt -lt $max_attempts ]; then
-      echo "Download failed (attempt $attempt/$max_attempts), retrying in 5s..."
-      sleep 5
+    exit_code=$?
+    if [ $exit_code -eq 33 ]; then
+      # Server doesn't support resume, remove partial file and retry from scratch
       rm -f "$tmpdir/$binary_name"
+    fi
+    if [ $attempt -lt $max_attempts ]; then
+      echo "Download interrupted (attempt $attempt/$max_attempts), resuming in 3s..."
+      sleep 3
     else
       echo "Error: download failed after $max_attempts attempts" >&2
       exit 1
