@@ -260,7 +260,7 @@ TELEGRAM_CHAT_ID=你的ChatID
 Present the two automated strategies and the supported dApp ecosystem:
 
 ```
-目前商店有 6 个自动化策略（3 个 EVM + 3 个 Solana）：
+目前商店有 5 个自动化策略（2 个 EVM + 3 个 Solana）：
 
 ┌─────────────────────────────────────────────────────────────────────┐
 │  A. USDC 智能调仓 (Auto-Rebalance)                                 │
@@ -289,18 +289,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 运行方式：后台守护进程，默认每 60 秒执行一次（可通过               │
 │    strategy-grid set --key tick_interval_secs --value N 调整）      │
 │  ● 特点：自适应波动率、风控熔断、仓位限制、失败重试                  │
-├─────────────────────────────────────────────────────────────────────┤
-│  C. 稳定币杠杆循环 (Aave Leverage Loop)                              │
-│                                                                     │
-│  在 Aave V3 上循环执行 USDC 存款→借款→再存款，赚取存借利差。         │
-│  全程 USDC，无币价风险，利差通过杠杆放大约 2.4 倍。                  │
-│                                                                     │
-│  ● 支持链：Ethereum、Polygon、Arbitrum、Base                        │
-│  ● 收益来源：Aave 存款利率 - 借款利率 × 杠杆倍数                    │
-│  ● 风险等级：⭐ 低（纯稳定币，需关注利差反转和健康因子）             │
-│  ● 预估年化：5%~15%（取决于存借利差和循环轮数）                      │
-│  ● 运行方式：AI 引导逐步执行（非自动守护进程）                       │
-│  ● 特点：健康因子监控、利差反转告警、一键去杠杆退出                  │
+
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  ═══════════════ Solana Meme 策略（依赖线上 skills-store）══════════════ │
@@ -364,7 +353,6 @@ Present the two automated strategies and the supported dApp ecosystem:
 |-----------|--------|
 | "A", "调仓", "auto-rebalance", "USDC 收益" | → Go to **Flow A** |
 | "B", "网格", "grid", "grid trading" | → Go to **Flow B** |
-| "C", "杠杆循环", "leverage loop", "套利" | → Go to **Flow C** |
 | "D", "涨幅榜", "ranking", "榜单狙击" | → Go to **Flow D** |
 | "E", "聪明钱", "signal", "跟单", "smart money" | → Go to **Flow E** |
 | "F", "memepump", "pump.fun", "meme 扫描" | → Go to **Flow F** |
@@ -421,206 +409,6 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 **不要在此 skill 里继续执行任何策略命令。**
 
-
-## Flow C: 稳定币杠杆循环 (Aave Leverage Loop)
-
-### 原理
-
-在 Aave V3 上执行 USDC 存款 → 借 USDC → 再存款 → 再借 → 再存款的循环，赚取存款利率和借款利率之间的利差。全程 USDC，无币价风险。
-
-```
-本金 1000 USDC，LTV 80%，循环 3 轮：
-
-第 1 轮：存入 1000 → 借出 800
-第 2 轮：存入 800  → 借出 640
-第 3 轮：存入 640  → 借出 512（保留不再循环）
-
-总存款 = 1000 + 800 + 640 = 2440 USDC
-总借款 = 800 + 640 + 512 = 1952 USDC (如最后一轮也循环)
-       = 800 + 640       = 1440 USDC (如最后一轮不借)
-有效杠杆 ≈ 2.44x
-
-净年化 = (总存款 × 存款利率 - 总借款 × 借款利率) / 本金
-举例：存款 4%, 借款 3% → (2440×4% - 1440×3%) / 1000 = 5.36%
-```
-
-### Step C1: Ask for chain
-
-```
-稳定币杠杆循环支持以下链：
-
-| 链 | Gas 成本 | 说明 |
-|----|----------|------|
-| Ethereum | ~$2-10/tx | TVL 最高，利率最稳定 |
-| Arbitrum | ~$0.1-0.5/tx | 推荐，Gas 低且流动性好 |
-| Polygon | ~$0.01/tx | Gas 极低 |
-| Base | ~$0.01/tx | Gas 极低 |
-
-推荐 Arbitrum（Gas 低 + 流动性好）。你想在哪条链上执行？
-```
-
-### Step C2: Check profitability
-
-After user selects chain, check real-time利差:
-
-```bash
-skills-store aave reserve USDC --chain {chain}
-```
-
-Extract `supplyAPY` and `borrowAPY`, then validate:
-
-```
-当前 Aave {chain} USDC 利率：
-
-| 指标 | 值 |
-|------|---|
-| 存款利率 (Supply APY) | {supply_apy}% |
-| 借款利率 (Borrow APY) | {borrow_apy}% |
-| 利差 | {spread}% |
-| 循环 3 轮后预估净年化 | {net_apy}% |
-```
-
-**Profitability check:**
-- If `supply_apy <= borrow_apy`: ABORT — "利差为负（存款 {supply}% < 借款 {borrow}%），当前不适合执行此策略。建议改用策略 A（智能调仓）或等待利率回归。"
-- If spread < 0.5%: WARN — "利差仅 {spread}%，杠杆后年化约 {net}%，收益偏低。是否继续？"
-- If spread >= 0.5%: PROCEED — "利差 {spread}%，杠杆放大后预估年化 {net}%，可以执行。"
-
-### Step C3: Ask for amount and confirm
-
-```
-请问投入多少 USDC？（需要你在 {chain} 上已有 USDC）
-```
-
-After user provides amount:
-
-```
-确认执行参数：
-
-| 参数 | 值 |
-|------|---|
-| 策略 | 稳定币杠杆循环 |
-| 链 | {chain} |
-| 本金 | {amount} USDC |
-| LTV | 80% |
-| 循环轮数 | 3（健康因子 > 1.20 时继续） |
-| 预估总存款 | ~{amount × 2.44} USDC |
-| 预估总借款 | ~{amount × 1.44} USDC |
-| 预估净年化 | {net_apy}% |
-| 预估月收益 | ~${monthly} |
-
-需要 EVM_PRIVATE_KEY 签署链上交易
-确认执行？(Y/n)
-```
-
-### Step C4: Execute leverage loops
-
-After user confirms, execute `skills-store aave` commands in sequence:
-
-```
-Step 1: 验证利差
-──────────────
-  skills-store aave reserve USDC --chain {chain}
-  → 确认 supply > borrow，否则中止
-
-Step 2: 首次存入
-──────────────
-  skills-store aave supply --asset USDC --amount {principal} --chain {chain}
-  → 确认 tx 成功
-  → total_supplied = principal
-
-Step 3: 循环（最多 3 轮）
-──────────────────────────
-  每一轮：
-
-    a) 检查健康因子：
-       skills-store aave account {address} --chain {chain}
-       → 如果 health_factor < 1.30，停止循环，报告当前状态
-
-    b) 借出 USDC：
-       borrow_amount = 上一轮存入金额 × 0.80
-       skills-store aave borrow --asset USDC --amount {borrow_amount} --chain {chain}
-       → total_borrowed += borrow_amount
-
-    c) 再存入：
-       skills-store aave supply --asset USDC --amount {borrow_amount} --chain {chain}
-       → total_supplied += borrow_amount
-
-Step 4: 报告最终状态
-────────────────────
-  skills-store aave account {address} --chain {chain}
-```
-
-Present final result:
-
-```
-稳定币杠杆循环完成！
-
-| 指标 | 值 |
-|------|---|
-| 本金 | {principal} USDC |
-| 总存款 | {total_supplied} USDC |
-| 总借款 | {total_borrowed} USDC |
-| 有效杠杆 | {total_supplied / principal}x |
-| 健康因子 | {health_factor} |
-| 存款利率 | {supply_apy}% |
-| 借款利率 | {borrow_apy}% |
-| 预估净年化 | {net_apy}% |
-| 预估月收益 | ~${monthly} |
-
-后续操作：
-• 查看仓位：skills-store aave account {address} --chain {chain}
-• 查看利率变化：skills-store aave reserve USDC --chain {chain}
-• 退出策略（去杠杆）：告诉我 "退出策略C" 或 "去杠杆"
-```
-
-### Exit Flow (去杠杆)
-
-When user says "退出策略C", "去杠杆", "close leverage loop":
-
-```
-Step 1: 查看当前仓位
-  skills-store aave account {address} --chain {chain}
-
-Step 2: 反向循环（逐轮退出）
-  每一轮：
-    a) skills-store aave withdraw --asset USDC --amount {该轮借出金额} --chain {chain}
-    b) skills-store aave repay --asset USDC --amount {该轮借出金额} --chain {chain}
-
-Step 3: 最终提取全部
-  skills-store aave withdraw --asset USDC --amount max --chain {chain}
-
-Step 4: 报告
-  "已完全退出杠杆循环，取回 {final_amount} USDC"
-```
-
-### Monitoring (策略监控)
-
-When user asks "策略C状态", "杠杆循环状态", "check my loop":
-
-```bash
-skills-store aave account {address} --chain {chain}
-skills-store aave reserve USDC --chain {chain}
-```
-
-Present:
-```
-| 指标 | 当前值 |
-|------|--------|
-| 总存款 (USD) | ${total_collateral} |
-| 总借款 (USD) | ${total_debt} |
-| 健康因子 | {health_factor} |
-| 存款利率 | {supply_apy}% |
-| 借款利率 | {borrow_apy}% |
-| 利差 | {spread}% |
-| 预估月净收益 | ~${monthly} |
-```
-
-Alerts:
-- `health_factor < 1.30` → "健康因子偏低 ({hf})，建议去杠杆一轮"
-- `health_factor < 1.10` → "清算风险！立即去杠杆"
-- `borrow_apy > supply_apy` → "利差转负，建议退出策略C"
-
----
 
 ## Flow D: SOL 涨幅榜狙击 (Ranking Sniper)
 
