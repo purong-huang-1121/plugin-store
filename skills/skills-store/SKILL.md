@@ -289,7 +289,6 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 运行方式：后台守护进程，默认每 60 秒执行一次（可通过               │
 │    strategy-grid set --key tick_interval_secs --value N 调整）      │
 │  ● 特点：自适应波动率、风控熔断、仓位限制、失败重试                  │
-
 ├─────────────────────────────────────────────────────────────────────┤
 │  D. SOL 涨幅榜狙击 (Ranking Sniper)                                  │
 │     分类：MEME交易  |  作者：Suning Yao (suning.yao@okg.com)        │
