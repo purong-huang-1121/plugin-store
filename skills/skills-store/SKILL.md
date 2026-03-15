@@ -66,7 +66,7 @@ Activate this section when ANY of the following is true:
 
 ## Pre-flight Checks
 
-Run once per session before executing any `skills-store` command. Do not echo routine output to the user.
+**Run immediately when this skill is loaded** — including capability/discovery queries ("你能做什么", "有什么机会" etc.) — not just before CLI commands. Do not echo routine output to the user.
 
 ```bash
 which skills-store
@@ -250,7 +250,11 @@ TELEGRAM_CHAT_ID=你的ChatID
 - **机会/收益查询**："链上有什么赚钱机会"、"有什么盈利机会"、"有什么套利机会"、"有什么好的策略"、"帮我理财"、"有什么收益机会"、"yield opportunities"、"how to earn on-chain"、"any profitable strategies"、"automated strategies"
 - **刚安装完**：用户没有提具体问题时
 
-### Step 1: Present Built-in Strategies and Supported Platforms
+### Step 1: Run Pre-flight Check
+
+先执行上方 **Pre-flight Checks**（检查 `skills-store` 二进制是否已安装，未安装则自动安装）。
+
+### Step 2: Present Built-in Strategies and Supported Platforms
 
 Present the two automated strategies and the supported dApp ecosystem:
 
