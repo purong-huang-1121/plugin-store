@@ -22,28 +22,28 @@ pub const MIN_WALLET_BALANCE: f64 = 0.1;
 
 // Slot guard thresholds
 pub const MAX_CHANGE_PCT: f64 = 150.0;
-pub const MIN_CHANGE_PCT: f64 = 1.0; // was 15.0 — lowered for testing
-pub const MIN_LIQUIDITY: f64 = 1000.0; // was 5000.0
-pub const MIN_MARKET_CAP: f64 = 1000.0; // was 5000.0
-pub const MAX_MARKET_CAP: f64 = 50_000_000.0; // was 10M
-pub const MIN_HOLDERS: i64 = 5; // was 30
-pub const MIN_BUY_RATIO: f64 = 0.40; // was 0.55
-pub const MIN_TRADERS: i64 = 5; // was 20
+pub const MIN_CHANGE_PCT: f64 = 15.0;
+pub const MIN_LIQUIDITY: f64 = 5000.0;
+pub const MIN_MARKET_CAP: f64 = 5000.0;
+pub const MAX_MARKET_CAP: f64 = 10_000_000.0;
+pub const MIN_HOLDERS: i64 = 30;
+pub const MIN_BUY_RATIO: f64 = 0.55;
+pub const MIN_TRADERS: i64 = 20;
 
-// Advanced safety thresholds — relaxed for testing
-pub const MAX_RISK_LEVEL: i64 = 3; // was 1
-pub const MAX_TOP10_HOLD: f64 = 80.0; // was 50.0
-pub const MAX_DEV_HOLD: f64 = 50.0; // was 20.0
-pub const MAX_BUNDLER_HOLD: f64 = 50.0; // was 15.0
-pub const MIN_LP_BURN: f64 = 0.0; // was 80.0
-pub const MAX_DEV_RUG_COUNT: i64 = 100; // was 10
-pub const MAX_SNIPER_HOLD: f64 = 50.0; // was 20.0
-pub const BLOCK_INTERNAL: bool = false; // was true
+// Advanced safety thresholds
+pub const MAX_RISK_LEVEL: i64 = 1;
+pub const MAX_TOP10_HOLD: f64 = 50.0;
+pub const MAX_DEV_HOLD: f64 = 20.0;
+pub const MAX_BUNDLER_HOLD: f64 = 15.0;
+pub const MIN_LP_BURN: f64 = 80.0;
+pub const MAX_DEV_RUG_COUNT: i64 = 10;
+pub const MAX_SNIPER_HOLD: f64 = 20.0;
+pub const BLOCK_INTERNAL: bool = true;
 
-// Holder risk scan thresholds — relaxed for testing
-pub const MAX_SUSPICIOUS_HOLD: f64 = 50.0; // was 10.0
-pub const MAX_SUSPICIOUS_COUNT: usize = 50; // was 5
-pub const BLOCK_PHISHING: bool = false; // was true
+// Holder risk scan thresholds
+pub const MAX_SUSPICIOUS_HOLD: f64 = 10.0;
+pub const MAX_SUSPICIOUS_COUNT: usize = 5;
+pub const BLOCK_PHISHING: bool = true;
 
 // Exit thresholds
 pub const HARD_STOP_PCT: f64 = -25.0;
@@ -54,8 +54,8 @@ pub const TRAILING_DRAWDOWN_PCT: f64 = 12.0;
 pub const TIME_STOP_SECS: u64 = 21600; // 6 hours
 pub const TP_LEVELS: [f64; 3] = [5.0, 15.0, 30.0]; // gradient take-profit
 
-// Momentum Score — lowered for testing
-pub const SCORE_BUY_THRESHOLD: u32 = 10; // was 40
+// Momentum Score
+pub const SCORE_BUY_THRESHOLD: u32 = 40;
 
 // Circuit breaker
 pub const MAX_CONSECUTIVE_ERRORS: u32 = 5;
