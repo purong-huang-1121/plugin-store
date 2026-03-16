@@ -37,6 +37,11 @@ description: >-
   Kalshi: 'Kalshi', 'US prediction markets', 'regulated event contracts', 'Kalshi positions',
   'Kalshi balance', 'federally authorized prediction markets'.
 
+  Automated trading strategies (install or run): '排行榜狙击', '涨幅榜狙击', 'ranking sniper',
+  'SOL sniper', '聪明钱跟单', '信号跟单', 'signal tracker', 'smart money', 'KOL跟单',
+  'memepump', 'pump扫描', 'meme scanner', 'pump.fun', 'USDC调仓', 'auto rebalance',
+  '网格交易', 'grid trading', 'grid bot', '自动化交易', 'trading bot', '量化策略'.
+
   Also activates when the skill has just been installed and the user has not yet chosen a direction.
 license: Apache-2.0
 metadata:
