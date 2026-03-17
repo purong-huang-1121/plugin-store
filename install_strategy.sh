@@ -124,14 +124,10 @@ install_binary() {
   while [ $attempt -lt $max_attempts ]; do
     attempt=$((attempt + 1))
     # -C - resumes partial download; exit 33 means server doesn't support resume (start over)
-    if curl -fL --retry 1 -C - "$url" -o "$tmpdir/$binary_name" 2>&1; then
+    if curl -fsSL --retry 2 "$url" -o "$tmpdir/$binary_name"; then
       break
     fi
-    exit_code=$?
-    if [ $exit_code -eq 33 ]; then
-      # Server doesn't support resume, remove partial file and retry from scratch
-      rm -f "$tmpdir/$binary_name"
-    fi
+    rm -f "$tmpdir/$binary_name"
     if [ $attempt -lt $max_attempts ]; then
       echo "Download interrupted (attempt $attempt/$max_attempts), resuming in 3s..."
       sleep 3
