@@ -225,7 +225,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 收益来源：借贷协议存款利息                                       │
 │  ● 风险等级：⭐ 低（纯稳定币，无币价风险）                          │
 │  ● 预估年化：3%~8%（取决于市场利率）                                │
-│  ● 运行方式：后台守护进程，定时检查 + 自动执行                      │
+│  ● 运行方式：后台自动运行，定时检查 + 自动执行                      │
 │  ● 特点：TVL 安全监控、Gas 熔断、Telegram 通知                      │
 ├─────────────────────────────────────────────────────────────────────┤
 │  B. ETH/USDC 网格交易 (Grid Trading)                                │
@@ -238,8 +238,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 交易对：ETH/USDC                                                │
 │  ● 风险等级：⭐⭐ 中低（持有 ETH 有币价风险，网格对冲部分波动）      │
 │  ● 预估年化：10%~30%（取决于市场波动率，震荡行情最佳）              │
-│  ● 运行方式：后台守护进程，默认每 60 秒执行一次（可通过               │
-│    strategy-grid set --key tick_interval_secs --value N 调整）      │
+│  ● 运行方式：后台自动运行，默认每 60 秒执行一次                      │
 │  ● 特点：自适应波动率、风控熔断、仓位限制、失败重试                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │  C. SOL 涨幅榜狙击 (Ranking Sniper)                                  │
@@ -251,11 +250,9 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 支持链：Solana                                                   │
 │  ● 收益来源：涨幅榜动量跟踪                                         │
 │  ● 风险等级：⭐⭐⭐ 高（Meme 币高波动）                              │
-│  ● 运行方式：后台守护进程，每 10 秒轮询                              │
+│  ● 运行方式：后台自动运行，每 10 秒检查                              │
 │  ● 风控：25 项链上安全检查 + Momentum Score 评分 + 6 层退出机制       │
 │  ● 特点：排名退出 > 硬止损 > 快速止损 > 追踪止损 > 时间止损 > 梯度止盈│
-│  ● 依赖：skills-store (token-ranking, token-advanced-info, holder,      │
-│          current-price, quote, swap)                                 │
 ├─────────────────────────────────────────────────────────────────────┤
 │  D. SOL 聪明钱跟单 (Signal Tracker)                                  │
 │     分类：MEME交易  |  作者：Ray Zhou & Cai Shuai                   │
@@ -266,12 +263,10 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 支持链：Solana                                                   │
 │  ● 收益来源：聪明钱信号跟单                                         │
 │  ● 风险等级：⭐⭐⭐ 高（Meme 币高波动）                              │
-│  ● 运行方式：后台守护进程，每 20 秒轮询                              │
+│  ● 运行方式：后台自动运行，每 20 秒检查                              │
 │  ● 风控：MC/流动性过滤 + Dev 零容忍检查 + Bundler 操控检测            │
 │         + K线追高检测 + Session 风控（连亏暂停）                     │
 │  ● 特点：同车钱包数分级仓位 + 成本感知止盈 + 时间衰减止损            │
-│  ● 依赖：skills-store (signal-list, price-info, token-search, candles,  │
-│          tokenDevInfo, tokenBundleInfo, balances, quote, swap)       │
 ├─────────────────────────────────────────────────────────────────────┤
 │  E. SOL Memepump 扫描 (Memepump Scanner)                             │
 │     分类：MEME交易  |  作者：Victor Lee                             │
@@ -282,11 +277,9 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  ● 支持链：Solana                                                   │
 │  ● 收益来源：Pump.fun 迁移后动量爆发                                │
 │  ● 风险等级：⭐⭐⭐ 高（Meme 币高波动）                              │
-│  ● 运行方式：后台守护进程，每 10 秒轮询                              │
+│  ● 运行方式：后台自动运行，每 10 秒检查                              │
 │  ● 风控：服务端安全过滤 + Dev/Bundler 深度验证 + 三重信号检测        │
 │  ● 特点：SCALP/MINIMUM 分档仓位 + Hot Mode 自适应 + 30min 最大持仓  │
-│  ● 依赖：skills-store (memepump-tokenList, tokenDevInfo,               │
-│          tokenBundleInfo, candles, trades, price-info, quote, swap)  │
 └─────────────────────────────────────────────────────────────────────┘
 
 请选择：输入 A ~ E
@@ -296,14 +289,14 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 ### Step 2: User Selects Strategy or Platform
 
-**⚠️ 用户选择任何策略或 dApp 后，必须先检查 onchainos CLI：**
+**⚠️ 用户选择任何策略或 dApp 后，必须先检查 onchainos 是否已安装：**
 
 ```bash
 onchainos --version
 ```
 
-- **未安装或版本 < 1.0.5** → 告知用户需要安装 onchainos CLI：
-  > "需要先安装 onchainos CLI（链上签名工具），请按照文档操作：https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1
+- **未安装或版本 < 1.0.5** → 告知用户需要安装 onchainos：
+  > "需要先安装 onchainos（链上签名工具），请按照文档操作：https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1
   > 安装完成后运行 `onchainos wallet login` 登录，然后继续。"
 - **已安装且版本 >= 1.0.5** → 继续下方路由
 
