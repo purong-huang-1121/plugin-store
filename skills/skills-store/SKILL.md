@@ -102,19 +102,19 @@ Activate this section when ANY of the following is true:
 | 用户意图 | 执行命令 |
 |---|---|
 | USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance` |
-| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/skills-store --skill strategy-grid` |
+| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade` |
 | SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper` |
 | SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker` |
 | SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner` |
 
 如果用户想安装**多个策略**，用空格分隔 skill 名称：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid strategy-signal-tracker
+npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade strategy-signal-tracker
 ```
 
 如果 skill 已存在，直接使用 `--yes` 覆盖安装，无需询问用户：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid --yes
+npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
 ```
 
 ### 安装后：配置 Telegram 通知（推荐）
@@ -326,7 +326,7 @@ Read file: ~/.agents/skills/strategy-auto-rebalance/SKILL.md
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid --yes
+npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导
