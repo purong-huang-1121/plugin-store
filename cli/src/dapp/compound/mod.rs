@@ -211,6 +211,8 @@ impl CompoundClient {
                         "0",
                     )
                     .await?;
+                    // Wait for approve to be confirmed on-chain before supplying
+                    tokio::time::sleep(std::time::Duration::from_secs(6)).await;
                 }
 
                 let supply_calldata = IComet::supplyCall {

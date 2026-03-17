@@ -197,6 +197,8 @@ impl MorphoVaultClient {
                         "0",
                     )
                     .await?;
+                    // Wait for approve to be confirmed on-chain before depositing
+                    tokio::time::sleep(std::time::Duration::from_secs(6)).await;
                 }
 
                 let deposit_calldata = IERC4626::depositCall {

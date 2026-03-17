@@ -335,6 +335,8 @@ impl AaveClient {
                         "0",
                     )
                     .await?;
+                    // Wait for approve to be confirmed on-chain before supplying
+                    tokio::time::sleep(std::time::Duration::from_secs(6)).await;
                 }
 
                 // Supply
@@ -597,6 +599,8 @@ impl AaveClient {
                         "0",
                     )
                     .await?;
+                    // Wait for approve to be confirmed on-chain before repaying
+                    tokio::time::sleep(std::time::Duration::from_secs(6)).await;
                 }
 
                 let repay_calldata = IPool::repayCall {
