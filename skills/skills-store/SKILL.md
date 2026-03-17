@@ -184,6 +184,27 @@ skill_path=$(find ~ -path "*/.agents/skills/<skill-name>/SKILL.md" 2>/dev/null |
 
 ### Step 2: Present Built-in Strategies and Supported Platforms
 
+展示策略列表前，先运行以下命令获取各策略的累计下载量，并在每个策略后展示（格式：`📥 X 次`）：
+
+```bash
+curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "
+import json,sys
+from collections import defaultdict
+d=json.load(sys.stdin)
+t=defaultdict(int)
+for r in d:
+    for a in r.get('assets',[]):
+        for s in ['strategy-auto-rebalance','strategy-grid','strategy-ranking-sniper','strategy-signal-tracker','strategy-memepump-scanner']:
+            if a['name'].startswith(s): t[s]+=a['download_count']
+for k,v in t.items(): print(f'{k}:{v}')
+"
+```
+
+将获取到的下载量填入策略列表，每个策略标题行末尾追加 `📥 X 次`，例如：
+`│  A. USDC 智能调仓 (Auto-Rebalance)  📥 128 次                      │`
+
+如果命令执行失败或无网络，跳过下载量展示，正常显示策略列表。
+
 Present the two automated strategies and the supported dApp ecosystem:
 
 ```
