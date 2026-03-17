@@ -24,18 +24,8 @@ description: >-
   'swap WETH for USDC on Uniswap', 'trade tokens on Uniswap', 'Uniswap fee tiers',
   'on-chain token swap', 'concentrated liquidity swap'.
 
-  Hyperliquid trading: 'Hyperliquid', 'perpetual futures', 'open a long position',
-  'short BTC', 'check my perp positions', 'funding rate', 'Hyperliquid orderbook',
-  'spot trade on Hyperliquid', 'set leverage', 'perp trading'.
-
   Ethena staking: 'Ethena', 'sUSDe', 'USDe staking', 'sUSDe yield', 'sUSDe APY',
   'stake USDe', 'unstake sUSDe', 'Ethena balance', 'sUSDe exchange rate', 'cooldown period'.
-
-  Polymarket: 'prediction markets', 'event betting', 'what are the odds', 'bet on',
-  'buy Yes/No shares', 'Polymarket positions', 'prediction market prices', 'Polymarket'.
-
-  Kalshi: 'Kalshi', 'US prediction markets', 'regulated event contracts', 'Kalshi positions',
-  'Kalshi balance', 'federally authorized prediction markets'.
 
   Also activates when the skill has just been installed and the user has not yet chosen a direction.
 license: Apache-2.0
@@ -103,8 +93,7 @@ Present the following welcome message:
 
 ─────────────────────────────────────────────────────
 已内置协议操作（直接告诉我想用哪个即可）：
-Aave 借贷 · Morpho · Uniswap swap · Hyperliquid 合约
-Ethena sUSDe · Polymarket · Kalshi
+Aave 借贷 · Morpho · Uniswap swap · Ethena sUSDe
 ```
 
 After presenting the welcome message, wait for the user's response. Do NOT immediately ask follow-up questions — let the user lead.
@@ -139,10 +128,7 @@ which plugin-store
 - User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `plugin-store aave`
 - User asks about **Morpho** (vault、借贷) → see **[Morpho CLI Reference]** below, run `plugin-store morpho`
 - User asks about **Uniswap** (换币、swap、报价) → see **[Uniswap CLI Reference]** below, run `plugin-store uniswap`
-- User asks about **Hyperliquid** (永续合约、funding rate、现货) → see **[Hyperliquid CLI Reference]** below, run `plugin-store hyperliquid`
 - User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `plugin-store ethena`
-- User asks about **Polymarket** (预测市场、下注) → see **[Polymarket CLI Reference]** below, run `plugin-store polymarket`
-- User asks about **Kalshi** (合规预测市场) → see **[Kalshi CLI Reference]** below, run `plugin-store kalshi`
 
 ### 自动化策略
 - User asks about **grid trading specifically** → use `plugin-store grid`
@@ -428,10 +414,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 │  Compound V3 │  借贷协议            │  Base, Ethereum               │
 │  Morpho      │  借贷协议 (Vault)    │  Base, Ethereum               │
 │  Uniswap V3  │  DEX 链上交易         │  Arbitrum, Ethereum, Polygon  │
-│  Hyperliquid │  永续合约 + 现货交易  │  Hyperliquid L1               │
 │  Ethena      │  sUSDe 质押收益       │  Ethereum                     │
-│  Polymarket  │  预测市场             │  Polygon                      │
-│  Kalshi      │  合规预测市场 (美国)  │  -（中心化）                  │
 └──────────────┴──────────────────────┴───────────────────────────────┘
 
 如果你想直接使用某个平台（如 "帮我在 Aave 存 USDC"、"Uniswap 换币"），
@@ -451,9 +434,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 | "都要", "both", "两个都跑" | → Explain that multiple strategies can run concurrently, guide one by one |
 | "Aave", "存款", "借贷" | → Route to `plugin-store aave` commands |
 | "Uniswap", "换币", "swap" | → Route to `plugin-store uniswap` commands |
-| "Hyperliquid", "永续", "合约" | → Route to `plugin-store hyperliquid` commands |
 | "Ethena", "sUSDe", "质押" | → Route to `plugin-store ethena` commands |
-| "Polymarket", "预测市场" | → Route to `plugin-store polymarket` commands |
 | Mentions a specific dApp platform | → Route to the corresponding `plugin-store <dapp>` commands |
 
 ---
@@ -1059,7 +1040,7 @@ TELEGRAM_CHAT_ID=...
 | User has no USDC | Suggest using `plugin-store uniswap swap` to swap first |
 | User has no ETH on Base | Suggest bridging or swapping |
 | EVM_PRIVATE_KEY not set | Show setup instructions before launching |
-| User asks about other strategies (funding rate, sUSDe loop) | These are not yet built-in — guide user through the steps using individual `plugin-store` commands (`plugin-store aave`, `plugin-store hyperliquid`, `plugin-store ethena`) |
+| User asks about other strategies (funding rate, sUSDe loop) | These are not yet built-in — guide user through the steps using individual `plugin-store` commands (`plugin-store aave`, `plugin-store ethena`) |
 | Aave 利差为负 (borrow > supply) | Strategy C 不可执行，建议策略 A 或等待利率回归 |
 | 健康因子过低 | 策略 C 循环时自动停止（HF < 1.30），提醒用户去杠杆 |
 | User just installed dapp-composer with no follow-up | Show Post-Install Welcome listing all skills |
@@ -1224,51 +1205,6 @@ plugin-store uniswap swap --from USDC --to WETH --amount 100 --chain ethereum --
 
 ---
 
-## [Hyperliquid CLI Reference]
-
-11 commands for perpetual futures and spot trading on Hyperliquid.
-
-### Authentication
-
-- **Data commands** (`markets`, `spot-markets`, `price`, `orderbook`, `funding`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `positions`, `balances`, `orders`): Require `EVM_PRIVATE_KEY` in `.env` (signs EIP-712 typed data for Hyperliquid L1).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `plugin-store hyperliquid markets` | No | List perpetual markets (price, leverage, volume) |
-| 2 | `plugin-store hyperliquid spot-markets` | No | List spot markets |
-| 3 | `plugin-store hyperliquid price <symbol>` | No | Real-time mid price |
-| 4 | `plugin-store hyperliquid orderbook <symbol>` | No | L2 order book snapshot |
-| 5 | `plugin-store hyperliquid funding <symbol>` | No | Current and historical funding rates |
-| 6 | `plugin-store hyperliquid buy --symbol <s> --size <n> --price <p> [--leverage <l>]` | Yes | Buy / open long |
-| 7 | `plugin-store hyperliquid sell --symbol <s> --size <n> --price <p>` | Yes | Sell / open short |
-| 8 | `plugin-store hyperliquid cancel --symbol <s> --order-id <oid>` | Yes | Cancel an open order |
-| 9 | `plugin-store hyperliquid positions` | Yes | View perpetual positions |
-| 10 | `plugin-store hyperliquid balances` | Yes | View USDC margin and spot balances |
-| 11 | `plugin-store hyperliquid orders [--symbol <s>]` | Yes | List open orders |
-
-### Key Concepts
-
-- **Funding Rate**: Hourly payment between longs/shorts. Positive = longs pay shorts.
-- **Cross Margin**: All positions share the same USDC margin pool.
-- **szDecimals**: Each asset has required size precision (e.g. BTC = 5 decimal places). Use `markets` to check.
-- **Liquidation Price**: Monitor closely — cross margin means losses in one position affect all others.
-
-### Quickstart
-
-```bash
-plugin-store hyperliquid markets
-plugin-store hyperliquid funding BTC
-plugin-store hyperliquid price BTC
-plugin-store hyperliquid buy --symbol BTC --size 0.01 --price 65000 --leverage 10
-plugin-store hyperliquid positions
-plugin-store hyperliquid sell --symbol BTC --size 0.01 --price 66000
-```
-
----
-
 ## [Ethena CLI Reference]
 
 5 commands for sUSDe yield-bearing stablecoin on Ethereum mainnet.
@@ -1305,99 +1241,3 @@ plugin-store ethena cooldown --amount 500
 plugin-store ethena unstake
 ```
 
----
-
-## [Polymarket CLI Reference]
-
-12 commands for prediction market search, pricing, and trading on Polygon.
-
-### Authentication
-
-- **Data commands** (`search`, `markets`, `event`, `price`, `book`, `history`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `orders`, `positions`, `balance`): Require `EVM_PRIVATE_KEY` in `.env` (Polygon wallet). API credentials auto-derived and cached at `~/.plugin-store/polymarket_creds.json`.
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `plugin-store polymarket search <query> [--limit <n>]` | No | Search prediction markets |
-| 2 | `plugin-store polymarket markets [--tag <tag>] [--sort <sort>] [--limit <n>]` | No | List popular/active markets |
-| 3 | `plugin-store polymarket event <event_id>` | No | Get event details with related markets |
-| 4 | `plugin-store polymarket price <token_id>` | No | Get Yes/No price, midpoint, spread |
-| 5 | `plugin-store polymarket book <token_id>` | No | View orderbook depth |
-| 6 | `plugin-store polymarket history <token_id> [--interval <1m\|1h\|1d\|1w>]` | No | Price history |
-| 7 | `plugin-store polymarket buy --token <id> --amount <usdc> --price <0-1>` | Yes | Buy outcome shares |
-| 8 | `plugin-store polymarket sell --token <id> --amount <shares> --price <0-1>` | Yes | Sell outcome shares |
-| 9 | `plugin-store polymarket cancel <order_id>` | Yes | Cancel an open order |
-| 10 | `plugin-store polymarket orders [--market <id>]` | Yes | View open orders |
-| 11 | `plugin-store polymarket positions` | Yes | View current positions |
-| 12 | `plugin-store polymarket balance` | Yes | View USDC balance |
-
-### Key Concepts
-
-- **Prices are probabilities**: Price 0.65 = 65% implied probability. Win pays $1.00 per share.
-- **Two token IDs per market**: `clobTokenIds[0]` = Yes, `clobTokenIds[1]` = No.
-- **CLOB model**: Central limit order book — orders may not fill immediately.
-- **USDC on Polygon**: All trading uses USDC on Polygon network.
-
-### Quickstart
-
-```bash
-plugin-store polymarket markets --sort volume --limit 10
-plugin-store polymarket search "bitcoin"
-plugin-store polymarket price <token_id>
-plugin-store polymarket buy --token <token_id> --amount 100 --price 0.65
-plugin-store polymarket positions
-```
-
----
-
-## [Kalshi CLI Reference]
-
-12 commands for US-regulated prediction market trading across demo and production environments.
-
-### Authentication
-
-- **Data commands** (`search`, `markets`, `event`, `price`, `book`, `history`): No auth needed.
-- **Trading commands** (`buy`, `sell`, `cancel`, `orders`, `positions`, `balance`): Require Kalshi RSA API credentials:
-  ```bash
-  KALSHI_KEY_ID=your-key-id
-  KALSHI_PRIVATE_KEY_PEM=/path/to/private_key.pem
-  ```
-  Get API keys at: https://kalshi.com/profile/api-keys
-
-**Important:** Default environment is `demo` (paper trading). Use `--env prod` for real trades. KYC required for production (US residents only).
-
-### Command Index
-
-| # | Command | Auth | Description |
-|---|---------|------|-------------|
-| 1 | `plugin-store kalshi [--env demo\|prod] search <query>` | No | Search events and markets |
-| 2 | `plugin-store kalshi [--env demo\|prod] markets [--sort <sort>] [--limit <n>]` | No | List popular/active markets |
-| 3 | `plugin-store kalshi [--env demo\|prod] event <event_ticker>` | No | Get event with related markets |
-| 4 | `plugin-store kalshi [--env demo\|prod] price <ticker>` | No | Get Yes/No price and probability |
-| 5 | `plugin-store kalshi [--env demo\|prod] book <ticker>` | No | View orderbook depth |
-| 6 | `plugin-store kalshi [--env demo\|prod] history <ticker> [--interval <1m\|1h\|1d\|1w>]` | No | Price history |
-| 7 | `plugin-store kalshi [--env demo\|prod] buy --ticker <t> --side <yes\|no> --count <n> --price <0-1>` | Yes | Buy outcome contracts |
-| 8 | `plugin-store kalshi [--env demo\|prod] sell --ticker <t> --side <yes\|no> --count <n> --price <0-1>` | Yes | Sell outcome contracts |
-| 9 | `plugin-store kalshi [--env demo\|prod] cancel <order_id>` | Yes | Cancel an open order |
-| 10 | `plugin-store kalshi [--env demo\|prod] orders [--ticker <t>]` | Yes | View open orders |
-| 11 | `plugin-store kalshi [--env demo\|prod] positions` | Yes | View current positions |
-| 12 | `plugin-store kalshi [--env demo\|prod] balance` | Yes | View USD account balance |
-
-### Key Concepts
-
-- **Prices in cents**: Price 65 = 65% probability. Buy Yes at 65 cents → pay $0.65/contract, win $1.00 if Yes.
-- **Count vs Amount**: Specify `--count` (number of contracts), not a USD amount. Each contract = $1 face value.
-- **Demo first**: Always test with `--env demo` before using `--env prod`.
-- **Kalshi vs Polymarket**: Kalshi = US licensed, KYC required, USD. Polymarket = decentralized, no KYC, USDC on Polygon.
-
-### Quickstart
-
-```bash
-plugin-store kalshi markets
-plugin-store kalshi search "fed rate"
-plugin-store kalshi price FED-24DEC-T5.25
-plugin-store kalshi buy --ticker FED-24DEC-T5.25 --side yes --count 10 --price 0.65
-plugin-store kalshi --env prod buy --ticker FED-24DEC-T5.25 --side yes --count 10 --price 0.65
-```

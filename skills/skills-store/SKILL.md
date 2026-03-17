@@ -24,18 +24,8 @@ description: >-
   'swap WETH for USDC on Uniswap', 'trade tokens on Uniswap', 'Uniswap fee tiers',
   'on-chain token swap', 'concentrated liquidity swap'.
 
-  Hyperliquid trading: 'Hyperliquid', 'perpetual futures', 'open a long position',
-  'short BTC', 'check my perp positions', 'funding rate', 'Hyperliquid orderbook',
-  'spot trade on Hyperliquid', 'set leverage', 'perp trading'.
-
   Ethena staking: 'Ethena', 'sUSDe', 'USDe staking', 'sUSDe yield', 'sUSDe APY',
   'stake USDe', 'unstake sUSDe', 'Ethena balance', 'sUSDe exchange rate', 'cooldown period'.
-
-  Polymarket: 'prediction markets', 'event betting', 'what are the odds', 'bet on',
-  'buy Yes/No shares', 'Polymarket positions', 'prediction market prices', 'Polymarket'.
-
-  Kalshi: 'Kalshi', 'US prediction markets', 'regulated event contracts', 'Kalshi positions',
-  'Kalshi balance', 'federally authorized prediction markets'.
 
   Automated trading strategies (install or run): '排行榜狙击', '涨幅榜狙击', 'ranking sniper',
   'SOL sniper', '聪明钱跟单', '信号跟单', 'signal tracker', 'smart money', 'KOL跟单',
@@ -99,10 +89,7 @@ Activate this section when ANY of the following is true:
 - User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `skills-store aave`
 - User asks about **Morpho** (vault、借贷) → see **[Morpho CLI Reference]** below, run `skills-store morpho`
 - User asks about **Uniswap** (换币、swap、报价) → see **[Uniswap CLI Reference]** below, run `skills-store uniswap`
-- User asks about **Hyperliquid** (永续合约、funding rate、现货) → see **[Hyperliquid CLI Reference]** below, run `skills-store hyperliquid`
 - User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `skills-store ethena`
-- User asks about **Polymarket** (预测市场、下注) → see **[Polymarket CLI Reference]** below, run `skills-store polymarket`
-- User asks about **Kalshi** (合规预测市场) → see **[Kalshi CLI Reference]** below, run `skills-store kalshi`
 
 ### 自动化策略
 - User asks about **grid trading specifically** → use `strategy-grid`
@@ -284,7 +271,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 
 请选择：输入 A ~ E
 
-另外也支持直接操作 dApp：Aave · Morpho · Uniswap · Hyperliquid · Ethena · Polymarket · Kalshi，直接说想用哪个就行。
+另外也支持直接操作 dApp：Aave · Morpho · Uniswap · Ethena，直接说想用哪个就行。
 ```
 
 ### Step 2: User Selects Strategy or Platform
@@ -310,9 +297,7 @@ onchainos --version
 | "都要", "both", "两个都跑" | → Explain that multiple strategies can run concurrently, guide one by one |
 | "Aave", "存款", "借贷" | → Route to `skills-store aave` commands |
 | "Uniswap", "换币", "swap" | → Route to `skills-store uniswap` commands |
-| "Hyperliquid", "永续", "合约" | → Route to `skills-store hyperliquid` commands |
 | "Ethena", "sUSDe", "质押" | → Route to `skills-store ethena` commands |
-| "Polymarket", "预测市场" | → Route to `skills-store polymarket` commands |
 | Mentions a specific dApp platform | → Route to the corresponding `skills-store <dapp>` commands |
 
 ---

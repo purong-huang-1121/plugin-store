@@ -404,8 +404,7 @@ State is stored at `~/.skills-store/grid_state.json` with atomic writes (write t
 | USDC yield optimization (Aave/Compound/Morpho) | `strategy-auto-rebalance` |
 | Aave V3 supply/withdraw/markets | `dapp-aave` |
 | Morpho vault operations | `dapp-morpho` (CLI: `skills-store morpho`) |
-| Hyperliquid perpetual trading | `dapp-hyperliquid` |
-| Prediction markets | `dapp-polymarket` / `dapp-kalshi` |
+
 
 ## Edge Cases
 

@@ -177,9 +177,8 @@ Key points to verify:
 
 - For single-protocol Aave operations → use `skills-store aave`
 - For Morpho vault operations → use `skills-store morpho`
-- For grid trading → use `strategy-grid-trade`
-- For prediction markets → use `skills-store polymarket` / `skills-store kalshi`
-- For perpetual trading → use `skills-store hyperliquid`
+- For grid trading → use `strategy-grid`
+
 
 ## Prerequisites
 
