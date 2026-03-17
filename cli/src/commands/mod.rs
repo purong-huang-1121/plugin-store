@@ -1,9 +1,6 @@
 pub mod dapp_aave;
 pub mod dapp_ethena;
-pub mod dapp_hyperliquid;
-pub mod dapp_kalshi;
 pub mod dapp_morpho;
-pub mod dapp_polymarket;
 pub mod dapp_uniswap;
 pub mod strategy_auto_rebalance;
 pub mod strategy_grid;

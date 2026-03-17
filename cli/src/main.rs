@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand, ValueEnum};
-use skills_store_cli::{commands, dapp, output};
+use skills_store_cli::{commands, output};
 
 #[derive(Parser)]
 #[command(
@@ -32,28 +32,10 @@ pub enum OutputFormat {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Polymarket prediction markets
-    Polymarket {
-        #[command(subcommand)]
-        command: commands::dapp_polymarket::PolymarketCommand,
-    },
     /// Aave V3 lending protocol
     Aave {
         #[command(subcommand)]
         command: commands::dapp_aave::AaveCommand,
-    },
-    /// Hyperliquid perpetual and spot exchange
-    Hyperliquid {
-        #[command(subcommand)]
-        command: commands::dapp_hyperliquid::HyperliquidCommand,
-    },
-    /// Kalshi regulated prediction markets (US)
-    Kalshi {
-        /// API environment: demo (default) or prod
-        #[arg(long, default_value = "demo")]
-        env: dapp::kalshi::auth::KalshiEnv,
-        #[command(subcommand)]
-        command: commands::dapp_kalshi::KalshiCommand,
     },
     /// Ethena sUSDe staking (yield-bearing stablecoin)
     Ethena {
@@ -77,10 +59,7 @@ async fn main() {
     let cli = Cli::parse();
 
     let result = match cli.command {
-        Commands::Polymarket { command } => commands::dapp_polymarket::execute(command).await,
         Commands::Aave { command } => commands::dapp_aave::execute(command).await,
-        Commands::Hyperliquid { command } => commands::dapp_hyperliquid::execute(command).await,
-        Commands::Kalshi { env, command } => commands::dapp_kalshi::execute(command, env).await,
         Commands::Ethena { command } => commands::dapp_ethena::execute(command).await,
         Commands::Morpho { command } => commands::dapp_morpho::execute(command).await,
         Commands::Uniswap { command } => commands::dapp_uniswap::execute(command).await,
