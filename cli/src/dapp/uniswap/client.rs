@@ -48,7 +48,7 @@ static BASE: UniswapChainConfig = UniswapChainConfig {
     chain_id: 8453,
     rpc_url: "https://base-rpc.publicnode.com",
     swap_router: "0x2626664c2603336E57B271c5C0b26F421741e481",
-    quoter_v2: "0x3d4e44Eb1374240CE5F1B136041f0B71EB3Dd5d",
+    quoter_v2: "0x3d4e44Eb1374240CE5F1B136041f0B71EB3Dd5de",
 };
 
 pub fn get_chain_config(chain: &str) -> Result<&'static UniswapChainConfig> {
