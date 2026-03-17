@@ -35,10 +35,6 @@ pub enum RankingSniperCommand {
         /// Min holders filter (overrides config)
         #[arg(long)]
         min_holders: Option<i64>,
-        /// Quick test: buy ~$0.01 worth of this token, then sell back immediately.
-        /// Skips all filters — just tests the swap pipeline.
-        #[arg(long)]
-        token: Option<String>,
     },
     /// Start the bot in foreground (tick every 10 seconds)
     Start {
@@ -72,14 +68,6 @@ pub enum RankingSniperCommand {
     },
     /// Market analysis (current ranking, top tokens)
     Analyze,
-    /// Test buy+sell round-trip for a token (dev/debug only)
-    TestTrade {
-        /// Token contract address
-        token: String,
-        /// SOL amount to buy (default: 0.01)
-        #[arg(long, default_value = "0.01")]
-        amount: f64,
-    },
     /// Show wallet SOL balance
     Balance,
     /// Show all configurable parameters and their current values
@@ -105,12 +93,7 @@ pub async fn execute(cmd: RankingSniperCommand) -> Result<()> {
             max_market_cap,
             min_change,
             min_holders,
-            token,
         } => {
-            // --token: quick buy+sell test, skip all filters
-            if let Some(token_addr) = token {
-                return cmd_quick_test(&token_addr).await;
-            }
             let notifier = make_notifier();
             let mut cfg = SniperConfig::load()?;
             if let Some(v) = budget { cfg.budget_sol = v; }
@@ -134,7 +117,6 @@ pub async fn execute(cmd: RankingSniperCommand) -> Result<()> {
         RankingSniperCommand::History { limit } => cmd_history(limit).await,
         RankingSniperCommand::Reset { force } => cmd_reset(force).await,
         RankingSniperCommand::Analyze => cmd_analyze().await,
-        RankingSniperCommand::TestTrade { token, amount } => cmd_test_trade(&token, amount).await,
         RankingSniperCommand::Balance => cmd_balance().await,
         RankingSniperCommand::Config => cmd_config().await,
         RankingSniperCommand::SellAll => cmd_sell_all().await,
@@ -1021,190 +1003,6 @@ async fn cmd_analyze() -> Result<()> {
         "top_tokens": tokens,
         "known_tokens_count": state.known_tokens.len(),
         "active_positions": state.positions.len(),
-    }));
-    Ok(())
-}
-
-// ── test-trade ───────────────────────────────────────────────────────
-
-/// Quick swap test: buy ~$0.01 worth of a token, then sell back.
-/// Skips all ranking/safety filters — purely tests the onchainos swap pipeline.
-async fn cmd_quick_test(token_addr: &str) -> Result<()> {
-    let client = SniperClient::new()?;
-
-    // Get SOL price to calculate ~$0.01 worth
-    let sol_price = match crate::onchainos::swap_quote(
-        "11111111111111111111111111111111",
-        "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
-        "1000000000", // 1 SOL
-        "solana",
-        None,
-    ) {
-        Ok(data) => {
-            let item = if data.is_array() { data[0].clone() } else { data };
-            item["toTokenAmount"]
-                .as_str()
-                .and_then(|s| s.parse::<f64>().ok())
-                .unwrap_or(100_000_000.0) // fallback ~$100
-                / 1_000_000.0 // USDC 6 decimals
-        }
-        Err(_) => 100.0, // fallback
-    };
-
-    // $0.01 worth of SOL in lamports
-    let sol_amount = 0.01 / sol_price;
-    let lamports = (sol_amount * 1e9) as u64;
-    // Minimum 100_000 lamports (0.0001 SOL) to avoid dust
-    let lamports = lamports.max(100_000);
-
-    eprintln!(
-        "[quick-test] SOL price: ${:.2} | Buying ${:.4} worth ({} lamports)",
-        sol_price,
-        lamports as f64 / 1e9 * sol_price,
-        lamports
-    );
-
-    // Buy
-    let buy_result = client
-        .buy_token(token_addr, lamports as f64 / 1e9)
-        .await?;
-    let buy_tx = buy_result.tx_hash.clone().unwrap_or_default();
-    eprintln!("[quick-test] BUY tx: {}", buy_tx);
-
-    // Wait for settlement
-    eprintln!("[quick-test] Waiting 8s...");
-    tokio::time::sleep(std::time::Duration::from_secs(8)).await;
-
-    // Query actual token balance
-    let sell_amount = match crate::onchainos::portfolio_all_balances(&client.wallet, "501") {
-        Ok(data) => {
-            let assets = data
-                .as_array()
-                .and_then(|arr| arr.first())
-                .and_then(|item| item["tokenAssets"].as_array())
-                .cloned()
-                .unwrap_or_default();
-            assets
-                .iter()
-                .find(|a| {
-                    a["tokenContractAddress"]
-                        .as_str()
-                        .unwrap_or("")
-                        .eq_ignore_ascii_case(token_addr)
-                })
-                .and_then(|a| a["rawBalance"].as_str().map(|s| s.to_string()))
-                .unwrap_or_default()
-        }
-        Err(_) => String::new(),
-    };
-
-    if sell_amount.is_empty() || sell_amount == "0" {
-        eprintln!("[quick-test] No token balance found, skipping sell");
-        output::success(json!({
-            "action": "quick_test",
-            "token": token_addr,
-            "buy_tx": buy_tx,
-            "sell_tx": null,
-            "note": "buy succeeded but no balance found for sell"
-        }));
-        return Ok(());
-    }
-
-    eprintln!("[quick-test] Selling back (amount_raw: {sell_amount})...");
-    let sell_result = client.sell_token(token_addr, &sell_amount).await?;
-    let sell_tx = sell_result.tx_hash.clone().unwrap_or_default();
-
-    output::success(json!({
-        "action": "quick_test",
-        "token": token_addr,
-        "buy_tx": buy_tx,
-        "sell_tx": sell_tx,
-        "buy_lamports": lamports,
-        "sell_amount_raw": sell_amount,
-    }));
-    Ok(())
-}
-
-async fn cmd_test_trade(token_addr: &str, amount_sol: f64) -> Result<()> {
-    let client = SniperClient::new()?;
-
-    // Step 1: Get price before buy
-    let price_before = client.fetch_price(token_addr).await?;
-    eprintln!(
-        "[test-trade] Token price: ${:.10} | Buying {amount_sol} SOL worth...",
-        price_before
-    );
-
-    // Step 2: Buy
-    let buy_result = client.buy_token(token_addr, amount_sol).await?;
-    let buy_tx = buy_result.tx_hash.clone().unwrap_or_default();
-    eprintln!(
-        "[test-trade] BUY tx: {} | amount_out: {}",
-        buy_tx, buy_result.amount_out
-    );
-
-    // Step 3: Small delay to let tx settle
-    tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-
-    // Step 4: Sell all back — use actual on-chain balance, not API estimate
-    eprintln!("[test-trade] Waiting 5s for token to settle...");
-    tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-
-    // Query actual token balance via onchainos portfolio
-    let sell_amount = match crate::onchainos::portfolio_all_balances(&client.wallet, "501") {
-        Ok(data) => {
-            let assets = data.as_array()
-                .and_then(|arr| arr.first())
-                .and_then(|item| item["tokenAssets"].as_array())
-                .cloned()
-                .unwrap_or_default();
-            let mut found = String::new();
-            for asset in &assets {
-                let addr = asset["tokenContractAddress"].as_str().unwrap_or("");
-                if addr.eq_ignore_ascii_case(token_addr) {
-                    // Use rawBalance (minimal units) for the sell amount
-                    if let Some(raw) = asset["rawBalance"].as_str().filter(|s| !s.is_empty()) {
-                        found = raw.to_string();
-                    } else if let Some(bal) = asset["balance"].as_str() {
-                        // Fallback: parse balance string and convert
-                        let bal_f: f64 = bal.parse().unwrap_or(0.0);
-                        let decimals = asset["decimal"].as_str()
-                            .and_then(|d| d.parse::<u32>().ok())
-                            .unwrap_or(6);
-                        found = format!("{}", (bal_f * 10f64.powi(decimals as i32)) as u64);
-                    }
-                    break;
-                }
-            }
-            if found.is_empty() || found == "0" {
-                format!("{}", buy_result.amount_out as u64) // fallback to estimate
-            } else {
-                found
-            }
-        }
-        Err(_) => format!("{}", buy_result.amount_out as u64), // fallback
-    };
-    eprintln!("[test-trade] Selling back (amount_raw: {sell_amount})...");
-    let sell_result = client.sell_token(token_addr, &sell_amount).await?;
-    let sell_tx = sell_result.tx_hash.clone().unwrap_or_default();
-
-    // Step 5: Get price after
-    let price_after = client.fetch_price(token_addr).await.unwrap_or(0.0);
-
-    output::success(json!({
-        "token": token_addr,
-        "amount_sol": amount_sol,
-        "buy": {
-            "tx_hash": buy_tx,
-            "price": price_before,
-            "amount_out": buy_result.amount_out,
-        },
-        "sell": {
-            "tx_hash": sell_tx,
-            "amount_out": sell_result.amount_out,
-        },
-        "price_before": price_before,
-        "price_after": price_after,
     }));
     Ok(())
 }
