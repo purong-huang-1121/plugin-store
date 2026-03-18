@@ -150,7 +150,7 @@ which strategy-signal-tracker
 
 1. **onchainos CLI**: Must be installed and logged in. Verify:
    ```bash
-   onchainos --version   # >= 1.0.5
+   onchainos --version   # >= 2.0.0
    onchainos wallet status  # must show loggedIn: true
    ```
    If not installed, follow: https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1

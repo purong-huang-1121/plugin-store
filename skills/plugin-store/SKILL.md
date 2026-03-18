@@ -286,10 +286,10 @@ Present the two automated strategies and the supported dApp ecosystem:
 ```bash
 onchainos --version
 ```
-- **未安装或版本 < 1.0.5** → 告知用户需要安装 onchainos：
+- **未安装或版本 < 2.0.0** → 告知用户需要安装 onchainos：
   > "需要先安装 onchainos（链上签名工具），请按照文档操作：https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1
   > 安装完成后运行 `onchainos wallet login` 登录，然后继续。"
-- **已安装且版本 >= 1.0.5** → 继续 ②
+- **已安装且版本 >= 2.0.0** → 继续 ②
 
 **② 检查 okx/onchainos-skills：**
 ```bash

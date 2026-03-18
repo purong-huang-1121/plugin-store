@@ -6,7 +6,7 @@ metadata:
   author: 单杰
   category: "DeFi · 交易"
   chain: Base
-  version: "2.0.0"
+  version: "1.0.5"
   homepage: "https://web3.okx.com"
 ---
 
@@ -116,7 +116,7 @@ which strategy-grid
 
 1. **onchainos CLI**: Must be installed and logged in. Verify:
    ```bash
-   onchainos --version   # >= 1.0.5
+   onchainos --version   # >= 2.0.0
    onchainos wallet status  # must show loggedIn: true
    ```
    If not installed, follow: https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1
