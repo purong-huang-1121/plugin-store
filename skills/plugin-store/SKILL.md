@@ -205,7 +205,7 @@ Present the two automated strategies and the supported dApp ecosystem:
 目前商店有 5 个自动化策略（2 个 EVM + 3 个 Solana）：
 
 ┌─────────────────────────────────────────────────────────────────────┐
-│  A. USDC 智能调仓 (Auto-Rebalance)                                  │
+│  A. USDC 智能调仓 (Auto Rebalance)                                  │
 │     分类：DeFi · 套利  |  作者：徐易朗                              │
 │                                                                     │
 │  自动在 Aave V3、Compound V3、Morpho 三个协议之间寻找最优 USDC      │
