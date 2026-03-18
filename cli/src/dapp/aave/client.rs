@@ -2,10 +2,8 @@
 
 use std::str::FromStr;
 
-use alloy::network::EthereumWallet;
 use alloy::primitives::{Address, U256};
 use alloy::providers::ProviderBuilder;
-use alloy::signers::local::PrivateKeySigner;
 use alloy::sol_types::SolCall;
 use anyhow::{bail, Context, Result};
 use serde_json::json;
@@ -16,8 +14,6 @@ use super::pool_data;
 
 /// Signing mode for write operations.
 pub enum SignerMode {
-    /// Local private key signing via Alloy.
-    Local(PrivateKeySigner),
     /// onchainos wallet CLI signing (chain name for the CLI flag).
     OnchainOs { chain_flag: String },
 }
@@ -38,19 +34,6 @@ impl AaveClient {
         })
     }
 
-    /// Create a client with signing capability from EVM_PRIVATE_KEY env var.
-    pub fn new_with_signer(chain: &str) -> Result<Self> {
-        let config = chains::get_chain_config(chain)?;
-        let pk = std::env::var("EVM_PRIVATE_KEY")
-            .context("EVM_PRIVATE_KEY env var required for write operations")?;
-        let pk = pk.strip_prefix("0x").unwrap_or(&pk);
-        let signer: PrivateKeySigner = pk.parse().context("invalid EVM_PRIVATE_KEY")?;
-        Ok(Self {
-            config,
-            signer: Some(SignerMode::Local(signer)),
-        })
-    }
-
     /// Create a client that signs via onchainos wallet CLI.
     pub fn new_with_onchainos(chain: &str) -> Result<Self> {
         let config = chains::get_chain_config(chain)?;
@@ -64,7 +47,6 @@ impl AaveClient {
     /// Get the signer's address.
     pub fn address(&self) -> Result<Address> {
         match &self.signer {
-            Some(SignerMode::Local(s)) => Ok(s.address()),
             Some(SignerMode::OnchainOs { .. }) => {
                 let addr_str = crate::onchainos::get_evm_address()?;
                 Address::from_str(&addr_str).context("invalid onchainos EVM address")
@@ -276,46 +258,6 @@ impl AaveClient {
         let user = self.address()?;
 
         match signer {
-            SignerMode::Local(local_signer) => {
-                let wallet = EthereumWallet::from(local_signer.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.config.rpc_url.parse()?);
-
-                // Check and approve allowance
-                let erc20 = IERC20::new(asset, &provider);
-                let current_allowance = erc20.allowance(user, pool_addr).call().await?;
-                if current_allowance < amount {
-                    let approve_receipt = erc20
-                        .approve(pool_addr, amount)
-                        .send()
-                        .await?
-                        .get_receipt()
-                        .await?;
-                    if !approve_receipt.status() {
-                        bail!("ERC20 approve transaction failed");
-                    }
-                }
-
-                // Supply
-                let pool = IPool::new(pool_addr, &provider);
-                let receipt = pool
-                    .supply(asset, amount, user, 0)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "supply",
-                    "chain_id": self.config.chain_id,
-                    "asset": format!("{}", asset),
-                    "amount": format_units(amount, U256::from(decimals)),
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs { chain_flag } => {
                 let provider = ProviderBuilder::new().connect_http(self.config.rpc_url.parse()?);
 
@@ -397,30 +339,6 @@ impl AaveClient {
         };
 
         match signer {
-            SignerMode::Local(local_signer) => {
-                let wallet = EthereumWallet::from(local_signer.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.config.rpc_url.parse()?);
-
-                let pool = IPool::new(pool_addr, &provider);
-                let receipt = pool
-                    .withdraw(asset, actual_amount, user)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "withdraw",
-                    "chain_id": self.config.chain_id,
-                    "asset": format!("{}", asset),
-                    "amount": format_units(actual_amount, U256::from(decimals)),
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs { chain_flag } => {
                 let withdraw_calldata = IPool::withdrawCall {
                     asset,
@@ -475,31 +393,6 @@ impl AaveClient {
         let user = self.address()?;
 
         match signer {
-            SignerMode::Local(local_signer) => {
-                let wallet = EthereumWallet::from(local_signer.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.config.rpc_url.parse()?);
-
-                let pool = IPool::new(pool_addr, &provider);
-                let receipt = pool
-                    .borrow(asset, amount, U256::from(2), 0, user)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "borrow",
-                    "chain_id": self.config.chain_id,
-                    "asset": format!("{}", asset),
-                    "amount": format_units(amount, U256::from(decimals)),
-                    "interest_rate_mode": "variable",
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs { chain_flag } => {
                 let borrow_calldata = IPool::borrowCall {
                     asset,
@@ -542,45 +435,6 @@ impl AaveClient {
         let user = self.address()?;
 
         match signer {
-            SignerMode::Local(local_signer) => {
-                let wallet = EthereumWallet::from(local_signer.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.config.rpc_url.parse()?);
-
-                let erc20 = IERC20::new(asset, &provider);
-                let current_allowance = erc20.allowance(user, pool_addr).call().await?;
-                if current_allowance < amount {
-                    let approve_receipt = erc20
-                        .approve(pool_addr, amount)
-                        .send()
-                        .await?
-                        .get_receipt()
-                        .await?;
-                    if !approve_receipt.status() {
-                        bail!("ERC20 approve transaction failed");
-                    }
-                }
-
-                let pool = IPool::new(pool_addr, &provider);
-                let receipt = pool
-                    .repay(asset, amount, U256::from(2), user)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "repay",
-                    "chain_id": self.config.chain_id,
-                    "asset": format!("{}", asset),
-                    "amount": format_units(amount, U256::from(decimals)),
-                    "interest_rate_mode": "variable",
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs { chain_flag } => {
                 let provider = ProviderBuilder::new().connect_http(self.config.rpc_url.parse()?);
 

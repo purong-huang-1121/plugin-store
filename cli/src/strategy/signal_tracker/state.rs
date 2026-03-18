@@ -1,4 +1,4 @@
-//! Signal tracker state management — persisted at ~/.skills-store/signal_tracker_state.json.
+//! Signal tracker state management — persisted at ~/.plugin-store/signal_tracker_state.json.
 
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
@@ -107,14 +107,14 @@ impl SignalTrackerState {
     pub fn state_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("signal_tracker_state.json")
     }
 
     pub fn pid_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("signal_tracker.pid")
     }
 

@@ -1,8 +1,8 @@
-//! Integration tests for `skills-store hyperliquid` commands.
+//! Integration tests for `plugin-store hyperliquid` commands.
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 use predicates::prelude::*;
 
 // ─── markets ────────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ fn hyperliquid_funding_btc() {
 
 #[test]
 fn hyperliquid_buy_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["hyperliquid", "buy"])
         .assert()
         .failure()
@@ -73,7 +73,7 @@ fn hyperliquid_buy_missing_params_fails() {
 
 #[test]
 fn hyperliquid_sell_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["hyperliquid", "sell"])
         .assert()
         .failure()

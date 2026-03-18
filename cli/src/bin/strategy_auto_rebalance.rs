@@ -1,6 +1,6 @@
 use clap::Parser;
-use skills_store_cli::commands::strategy_auto_rebalance::{execute, AutoRebalanceCommand};
-use skills_store_cli::output;
+use plugin_store_cli::commands::strategy_auto_rebalance::{execute, AutoRebalanceCommand};
+use plugin_store_cli::output;
 
 #[derive(Parser)]
 #[command(
@@ -15,6 +15,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    plugin_store_cli::update::check("strategy-auto-rebalance", env!("CARGO_PKG_VERSION"));
     let cli = Cli::parse();
     if let Err(e) = execute(cli.command).await {
         output::error(&format!("{e:#}"));

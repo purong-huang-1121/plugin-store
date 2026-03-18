@@ -1,4 +1,4 @@
-//! Shared test helpers for skills-store CLI integration tests.
+//! Shared test helpers for plugin-store CLI integration tests.
 
 use assert_cmd::cargo::cargo_bin_cmd;
 use serde_json::Value;
@@ -15,9 +15,9 @@ pub mod tokens {
     pub const SOL_WSOL: &str = "So11111111111111111111111111111111111111112";
 }
 
-/// Build a `Command` for the `skills-store` binary.
-pub fn skills_store() -> assert_cmd::Command {
-    assert_cmd::Command::from(cargo_bin_cmd!("skills-store"))
+/// Build a `Command` for the `plugin-store` binary.
+pub fn plugin_store() -> assert_cmd::Command {
+    assert_cmd::Command::from(cargo_bin_cmd!("plugin-store"))
 }
 
 /// Parse stdout as JSON, assert `ok: true`, and return the `data` field.
@@ -56,7 +56,7 @@ pub fn run_with_retry(args: &[&str]) -> std::process::Output {
             let secs = 2u64.pow(attempt as u32);
             std::thread::sleep(std::time::Duration::from_secs(secs));
         }
-        let output = skills_store().args(args).output().expect("failed to execute");
+        let output = plugin_store().args(args).output().expect("failed to execute");
 
         if output.status.success() {
             return output;
@@ -66,5 +66,5 @@ pub fn run_with_retry(args: &[&str]) -> std::process::Output {
             return output;
         }
     }
-    skills_store().args(args).output().expect("failed to execute")
+    plugin_store().args(args).output().expect("failed to execute")
 }

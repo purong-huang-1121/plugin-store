@@ -1,4 +1,4 @@
-//! Integration tests for `skills-store kalshi` commands.
+//! Integration tests for `plugin-store kalshi` commands.
 //!
 //! Read-only tests (search, markets, event, price, book, history) run against
 //! the **demo** environment by default — no credentials needed.
@@ -9,7 +9,7 @@
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 use predicates::prelude::*;
 use serde_json::Value;
 
@@ -18,7 +18,7 @@ use serde_json::Value;
 /// Try to fetch one active market ticker from the demo environment.
 /// Returns None if the API is unreachable or returns no results.
 fn fetch_demo_ticker() -> Option<String> {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["kalshi", "--env", "demo", "markets", "--limit", "1"])
         .output()
         .ok()?;
@@ -36,7 +36,7 @@ fn fetch_demo_ticker() -> Option<String> {
 }
 
 fn fetch_demo_event_ticker() -> Option<String> {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["kalshi", "--env", "demo", "markets", "--limit", "1"])
         .output()
         .ok()?;
@@ -82,7 +82,7 @@ fn kalshi_markets_open_status() {
 
 #[test]
 fn kalshi_markets_invalid_env_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "staging", "markets"])
         .assert()
         .failure();
@@ -109,7 +109,7 @@ fn kalshi_search_with_limit() {
 
 #[test]
 fn kalshi_search_missing_query_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "search"])
         .assert()
         .failure()
@@ -137,7 +137,7 @@ fn kalshi_event_with_real_ticker() {
 
 #[test]
 fn kalshi_event_missing_ticker_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "event"])
         .assert()
         .failure()
@@ -166,7 +166,7 @@ fn kalshi_price_with_real_ticker() {
 
 #[test]
 fn kalshi_price_missing_ticker_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "price"])
         .assert()
         .failure()
@@ -206,7 +206,7 @@ fn kalshi_book_with_real_ticker() {
 
 #[test]
 fn kalshi_book_missing_ticker_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "book"])
         .assert()
         .failure()
@@ -259,7 +259,7 @@ fn kalshi_history_with_interval() {
 #[test]
 fn kalshi_buy_invalid_side_fails() {
     // Even without credentials, invalid --side should error before auth check
-    let output = skills_store()
+    let output = plugin_store()
         .args([
             "kalshi",
             "--env",
@@ -287,7 +287,7 @@ fn kalshi_buy_invalid_side_fails() {
 
 #[test]
 fn kalshi_buy_price_out_of_range_fails() {
-    let output = skills_store()
+    let output = plugin_store()
         .args([
             "kalshi",
             "--env",
@@ -314,7 +314,7 @@ fn kalshi_buy_price_out_of_range_fails() {
 
 #[test]
 fn kalshi_buy_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "buy"])
         .assert()
         .failure()
@@ -323,7 +323,7 @@ fn kalshi_buy_missing_params_fails() {
 
 #[test]
 fn kalshi_sell_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["kalshi", "--env", "demo", "sell"])
         .assert()
         .failure()
@@ -336,13 +336,13 @@ fn kalshi_sell_missing_params_fails() {
 fn kalshi_buy_missing_credentials_returns_error() {
     // Skip if credentials are available via env var OR cached credentials file.
     let cache_path = dirs::home_dir()
-        .map(|h| h.join(".skills-store/kalshi_demo.json"))
+        .map(|h| h.join(".plugin-store/kalshi_demo.json"))
         .filter(|p| p.exists());
     if std::env::var("KALSHI_KEY_ID").is_ok() || cache_path.is_some() {
         eprintln!("SKIP: credentials are set — skipping missing-key test");
         return;
     }
-    let output = skills_store()
+    let output = plugin_store()
         .args([
             "kalshi",
             "--env",

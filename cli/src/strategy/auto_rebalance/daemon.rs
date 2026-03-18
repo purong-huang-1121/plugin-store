@@ -33,7 +33,7 @@ const SAFETY_CHECK_INTERVAL_SECS: u64 = 900;
 pub fn pid_path() -> PathBuf {
     dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join(".skills-store")
+        .join(".plugin-store")
         .join("auto-rebalance-daemon.pid")
 }
 
@@ -657,7 +657,7 @@ async fn detect_current_protocol(config: &'static AutoRebalanceConfig) -> Option
     let rpc_m = rpc.clone();
 
     let compound_fut = async {
-        match CompoundClient::new_with_signer(config.compound_comet, config.usdc, &rpc_c) {
+        match CompoundClient::new_with_onchainos(config.compound_comet, config.usdc, &rpc_c, config.chain_name) {
             Ok(c) => c
                 .get_balance()
                 .await
@@ -677,7 +677,7 @@ async fn detect_current_protocol(config: &'static AutoRebalanceConfig) -> Option
         let vaults = get_morpho_usdc_vaults(config).await;
         let mut best = 0.0f64;
         for vault_addr in &vaults {
-            let usd = match MorphoVaultClient::new_with_signer(vault_addr, config.usdc, &rpc_m) {
+            let usd = match MorphoVaultClient::new_with_onchainos(vault_addr, config.usdc, &rpc_m, config.chain_name) {
                 Ok(m) => m
                     .get_balance_usdc()
                     .await
@@ -693,7 +693,7 @@ async fn detect_current_protocol(config: &'static AutoRebalanceConfig) -> Option
     };
 
     let aave_fut = async {
-        match AaveClient::new_with_signer(aave_chain) {
+        match AaveClient::new_with_onchainos(aave_chain) {
             Ok(aave) => aave
                 .get_usdc_atoken_balance()
                 .await
@@ -754,7 +754,7 @@ async fn detect_balance(protocol: Protocol, config: &'static AutoRebalanceConfig
     let aave_chain = config.aave_chain_key;
 
     match protocol {
-        Protocol::Aave => match AaveClient::new_with_signer(aave_chain) {
+        Protocol::Aave => match AaveClient::new_with_onchainos(aave_chain) {
             Ok(aave) => {
                 // Query the actual aToken balance (includes accrued interest).
                 // This is the exact amount that can be withdrawn.
@@ -769,7 +769,7 @@ async fn detect_balance(protocol: Protocol, config: &'static AutoRebalanceConfig
             Err(_) => U256::ZERO,
         },
         Protocol::Compound => {
-            match CompoundClient::new_with_signer(config.compound_comet, config.usdc, &rpc) {
+            match CompoundClient::new_with_onchainos(config.compound_comet, config.usdc, &rpc, config.chain_name) {
                 Ok(c) => c.get_balance().await.unwrap_or(U256::ZERO),
                 Err(_) => U256::ZERO,
             }
@@ -779,7 +779,7 @@ async fn detect_balance(protocol: Protocol, config: &'static AutoRebalanceConfig
             let vaults = get_morpho_usdc_vaults(config).await;
             let mut best = U256::ZERO;
             for vault_addr in &vaults {
-                if let Ok(m) = MorphoVaultClient::new_with_signer(vault_addr, config.usdc, &rpc) {
+                if let Ok(m) = MorphoVaultClient::new_with_onchainos(vault_addr, config.usdc, &rpc, config.chain_name) {
                     if let Ok(b) = m.get_balance_usdc().await {
                         if b > best {
                             best = b;
@@ -797,18 +797,8 @@ async fn detect_balance(protocol: Protocol, config: &'static AutoRebalanceConfig
 async fn estimate_gas_cost_usd(config: &'static AutoRebalanceConfig) -> Result<f64> {
     const TOTAL_GAS_UNITS: u64 = 500_000;
 
-    // Try onchainos gateway gas first, fall back to RPC
-    let gas_price: u128 = if let Ok(price) = crate::onchainos::get_gas_price(config.chain_name) {
-        price
-    } else {
-        use alloy::providers::{Provider, ProviderBuilder};
-        let rpc = chains::rpc_url_for(config);
-        let provider = ProviderBuilder::new().connect_http(rpc.parse()?);
-        provider
-            .get_gas_price()
-            .await
-            .context("failed to get gas price")? as u128
-    };
+    let gas_price: u128 = crate::onchainos::get_gas_price(config.chain_name)
+        .context("failed to get gas price from onchainos")?;
 
     let gas_cost_wei = gas_price * TOTAL_GAS_UNITS as u128;
     let gas_cost_eth = gas_cost_wei as f64 / 1e18;
@@ -903,55 +893,11 @@ async fn detect_wallet_usdc(config: &'static AutoRebalanceConfig) -> f64 {
 
 /// Get the wallet's raw USDC balance (U256, 6 decimals).
 async fn detect_wallet_usdc_raw(config: &'static AutoRebalanceConfig) -> U256 {
-    // Try onchainos balance query first
-    if crate::onchainos::is_available() {
-        if let Ok(balances) = crate::onchainos::get_token_balances(config.chain_name) {
-            if let Some(usdc) = balances.iter().find(|b| b.symbol.eq_ignore_ascii_case("USDC")) {
-                let raw = (usdc.balance * 1e6) as u64;
-                return U256::from(raw);
-            }
-            return U256::ZERO; // onchainos worked but no USDC found
-        }
-        // Fall through to RPC on failure
-    }
-
-    use alloy::primitives::Address;
-    use alloy::providers::ProviderBuilder;
-    use std::str::FromStr;
-
-    let user = if let Ok(addr_str) = crate::onchainos::get_evm_address() {
-        match Address::from_str(&addr_str) {
-            Ok(a) => a,
-            Err(_) => return U256::ZERO,
-        }
-    } else {
-        return U256::ZERO;
-    };
-
-    let rpc = chains::rpc_url_for(config);
-    let provider = match rpc.parse() {
-        Ok(url) => ProviderBuilder::new().connect_http(url),
-        Err(_) => return U256::ZERO,
-    };
-
-    let usdc_addr = match Address::from_str(config.usdc) {
-        Ok(a) => a,
-        Err(_) => return U256::ZERO,
-    };
-
-    alloy::sol! {
-        #[sol(rpc)]
-        interface IERC20Balance {
-            function balanceOf(address account) external view returns (uint256);
+    if let Ok(balances) = crate::onchainos::get_token_balances(config.chain_name) {
+        if let Some(usdc) = balances.iter().find(|b| b.symbol.eq_ignore_ascii_case("USDC")) {
+            let raw = (usdc.balance * 1e6) as u64;
+            return U256::from(raw);
         }
     }
-
-    let erc20 = IERC20Balance::new(usdc_addr, &provider);
-    match erc20.balanceOf(user).call().await {
-        Ok(balance) => balance,
-        Err(e) => {
-            eprintln!("[WARN] Wallet USDC balance check failed: {e:#}");
-            U256::ZERO
-        }
-    }
+    U256::ZERO
 }

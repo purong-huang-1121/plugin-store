@@ -1,15 +1,15 @@
-//! Integration tests for `skills-store ranking-sniper` commands.
+//! Integration tests for `plugin-store ranking-sniper` commands.
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 use predicates::prelude::*;
 
 // ─── status on empty state ──────────────────────────────────────────
 
 #[test]
 fn ranking_sniper_status_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["ranking-sniper", "status"])
         .output()
         .expect("failed to execute");
@@ -22,7 +22,7 @@ fn ranking_sniper_status_empty_state() {
 
 #[test]
 fn ranking_sniper_report_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["ranking-sniper", "report"])
         .output()
         .expect("failed to execute");
@@ -35,7 +35,7 @@ fn ranking_sniper_report_empty_state() {
 
 #[test]
 fn ranking_sniper_history_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["ranking-sniper", "history"])
         .output()
         .expect("failed to execute");
@@ -66,7 +66,7 @@ fn ranking_sniper_analyze_returns_data() {
 fn ranking_sniper_tick_missing_address_fails() {
     // The binary loads .env via dotenvy, so SOL_ADDRESS is typically set.
     // This test verifies behavior when no address is available.
-    let output = skills_store()
+    let output = plugin_store()
         .env_remove("SOL_ADDRESS")
         .args(["ranking-sniper", "tick"])
         .output()
@@ -95,7 +95,7 @@ fn ranking_sniper_tick_dry_run() {
 
 #[test]
 fn ranking_sniper_reset_without_force_warns() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["ranking-sniper", "reset"])
         .output()
         .expect("failed to execute");
@@ -112,7 +112,7 @@ fn ranking_sniper_reset_without_force_warns() {
 
 #[test]
 fn ranking_sniper_missing_subcommand_fails() {
-    skills_store()
+    plugin_store()
         .args(["ranking-sniper"])
         .assert()
         .failure()
@@ -123,7 +123,7 @@ fn ranking_sniper_missing_subcommand_fails() {
 
 #[test]
 fn ranking_sniper_stop_no_bot_returns_error() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["ranking-sniper", "stop"])
         .output()
         .expect("failed to execute");

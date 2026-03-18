@@ -47,43 +47,51 @@ which onchainos
     ```
     Stop here until user confirms onchainos is available.
 
-### Step 2: Check skills-store
+### Step 2: Check plugin-store
 
 ```bash
-which skills-store
+which plugin-store
 ```
 
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
   ```
 
-- **Check for updates**: Read `~/.cargo/bin/.skills-store/last_check_ranking_sniper` and compare with current timestamp:
-  ```bash
-  cached_ts=$(cat ~/.cargo/bin/.skills-store/last_check_ranking_sniper 2>/dev/null || true)
-  now=$(date +%s)
-  ```
-  - If `cached_ts` is non-empty and `(now - cached_ts) < 43200` (12 hours), skip the update.
-  - Otherwise, run the installer to check for updates.
-
-### Step 3: Check strategy-ranking-sniper
+### Step 3: Check strategy-ranking-sniper binary and version
 
 ```bash
 which strategy-ranking-sniper
 ```
 
-- **Found** → proceed.
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
   ```
-  - If install **succeeds** → verify with `strategy-ranking-sniper --version`, then proceed.
-  - If install **fails** → notify the user:
+  - If install **fails** → notify user and stop.
+
+- **Check for updates** (12h cache):
+  ```bash
+  CACHE="$HOME/.plugin-store/update_check/skill-strategy-ranking-sniper"
+  NOW=$(date +%s)
+  LAST=$(cat "$CACHE" 2>/dev/null || echo 0)
+  if [ $((NOW - LAST)) -ge 43200 ]; then
+    mkdir -p "$(dirname "$CACHE")" && echo "$NOW" > "$CACHE"
+    LOCAL=$(strategy-ranking-sniper --version 2>/dev/null | awk '{print $2}')
+    LATEST=$(curl -sSf --max-time 3 \
+      "https://api.github.com/repos/purong-huang-1121/plugin-store/releases/latest" \
+      2>/dev/null | grep '"tag_name"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+    [ -n "$LATEST" ] && [ "$LATEST" != "$LOCAL" ] && echo "NEW_VERSION:$LATEST"
+  fi
+  ```
+  - If output contains `NEW_VERSION:X.X.X` → tell user:
     ```
-    自动安装失败，请手动安装 strategy-ranking-sniper：
-    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper
+    strategy-ranking-sniper 有新版本 X.X.X 可用，建议更新（当前 {LOCAL}）：
+    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-ranking-sniper \
+      && npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper --yes
     ```
-    Stop here until user confirms installation.
+    Ask user if they want to update now before continuing.
+  - Otherwise → proceed silently.
 
 ## Skill Routing
 
@@ -138,7 +146,7 @@ which strategy-ranking-sniper
 
 1. Run `strategy-ranking-sniper config` to show the user their current parameters
 2. Present the parameters in a readable table and ask if they want to adjust any
-3. If the user wants to change parameters, edit the config file at `~/.skills-store/ranking_sniper_config.json` directly
+3. If the user wants to change parameters, edit the config file at `~/.plugin-store/ranking_sniper_config.json` directly
 4. Parameters are persisted across restarts
 
 Example flow:
@@ -164,7 +172,7 @@ strategy-ranking-sniper start --budget 0.5 --per-trade 0.05 --dry-run
 展示欢迎信息前，先运行以下命令获取该策略的累计下载量（失败时显示 `-`）：
 
 ```bash
-curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-ranking-sniper')))"
+curl -s "https://api.github.com/repos/purong-huang-1121/plugin-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-ranking-sniper')))"
 ```
 
 将结果数字嵌入 banner 的 `📥 X 次` 处，命令失败则用 `-` 代替。
@@ -381,7 +389,7 @@ Priority order (first match exits):
 
 ## Configurable Parameters
 
-Parameters are persisted at `~/.skills-store/ranking_sniper_config.json`. View with `strategy-ranking-sniper config`. Edit the JSON file directly to change values.
+Parameters are persisted at `~/.plugin-store/ranking_sniper_config.json`. View with `strategy-ranking-sniper config`. Edit the JSON file directly to change values.
 
 ### Money Management
 
@@ -463,7 +471,7 @@ strategy-ranking-sniper tick [--budget <sol>] [--per-trade <sol>] [--dry-run]
 
 ### strategy-ranking-sniper start
 
-Start the bot in foreground, executing `tick` every 10 seconds. Creates a PID file at `~/.skills-store/ranking_sniper.pid`. Use Ctrl+C or `ranking-sniper stop` to terminate. Logs to `~/.skills-store/ranking_sniper.log`.
+Start the bot in foreground, executing `tick` every 10 seconds. Creates a PID file at `~/.plugin-store/ranking_sniper.pid`. Use Ctrl+C or `ranking-sniper stop` to terminate. Logs to `~/.plugin-store/ranking_sniper.log`.
 
 ```bash
 strategy-ranking-sniper start [--budget <sol>] [--per-trade <sol>] [--dry-run]
@@ -749,9 +757,9 @@ fetch_ranking(top_n=20)              <- OKX /token/toplist (sort by 5m change)
 
 ```
 1. strategy-ranking-sniper status                              -> get token address
-2. okx-dex-token    skills-store token search TOKEN --chain solana -> token details
-3. okx-dex-market   skills-store market kline --address <addr> --chain solana -> chart
-4. okx-wallet-portfolio  skills-store portfolio balance --chain solana -> wallet balance
+2. okx-dex-token    plugin-store token search TOKEN --chain solana -> token details
+3. okx-dex-market   plugin-store market kline --address <addr> --chain solana -> chart
+4. okx-wallet-portfolio  plugin-store portfolio balance --chain solana -> wallet balance
 ```
 
 ### Workflow D: Test Before Deploying
@@ -759,7 +767,7 @@ fetch_ranking(top_n=20)              <- OKX /token/toplist (sort by 5m change)
 > User: "I want to test the sniper on a specific token before going live."
 
 ```
-1. okx-dex-token    skills-store token search HYPE --chain solana              -> find token
+1. okx-dex-token    plugin-store token search HYPE --chain solana              -> find token
 2. strategy-ranking-sniper test-trade <token_address> --amount 0.01        -> round-trip test
 3. strategy-ranking-sniper start --budget 0.5 --per-trade 0.05 --dry-run  -> dry-run session
        | verify actions look correct
@@ -770,14 +778,14 @@ fetch_ranking(top_n=20)              <- OKX /token/toplist (sort by 5m change)
 
 ## State Persistence
 
-State is stored at `~/.skills-store/ranking_sniper_state.json` with atomic writes (write to `.tmp`, rename).
+State is stored at `~/.plugin-store/ranking_sniper_state.json` with atomic writes (write to `.tmp`, rename).
 
 | File | Purpose |
 |------|---------|
-| `~/.skills-store/ranking_sniper_state.json` | Full bot state (positions, trades, stats, known tokens) |
-| `~/.skills-store/ranking_sniper_config.json` | User-configurable parameters |
-| `~/.skills-store/ranking_sniper.pid` | PID file for running bot |
-| `~/.skills-store/ranking_sniper.log` | Execution log |
+| `~/.plugin-store/ranking_sniper_state.json` | Full bot state (positions, trades, stats, known tokens) |
+| `~/.plugin-store/ranking_sniper_config.json` | User-configurable parameters |
+| `~/.plugin-store/ranking_sniper.pid` | PID file for running bot |
+| `~/.plugin-store/ranking_sniper.log` | Execution log |
 
 State includes:
 - `known_tokens` — Set of all token addresses ever seen (prevents re-entry)
@@ -831,7 +839,7 @@ State includes:
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | "onchainos wallet not available" | Not logged in | Run `onchainos wallet status` and login if needed |
-| Circuit breaker trips | Repeated API/swap failures | Check logs at `~/.skills-store/ranking_sniper.log`, fix root cause, wait 1h or reset |
+| Circuit breaker trips | Repeated API/swap failures | Check logs at `~/.plugin-store/ranking_sniper.log`, fix root cause, wait 1h or reset |
 | No buys happening | Score threshold too high, or safety filters too strict | Try `--dry-run` to see skip reasons, adjust config thresholds |
 | All tokens skipped by slot_guard | Thresholds set to production values | For testing, lower `min_change_pct`, `min_liquidity`, `min_holders`, etc. |
 | Sell fails repeatedly | Low liquidity token | Use `sell-all` (auto-retries with halved amounts) or manual `sell` |

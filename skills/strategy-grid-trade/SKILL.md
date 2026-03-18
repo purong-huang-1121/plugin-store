@@ -47,43 +47,51 @@ which onchainos
     ```
     Stop here until user confirms onchainos is available.
 
-### Step 2: Check skills-store
+### Step 2: Check plugin-store
 
 ```bash
-which skills-store
+which plugin-store
 ```
 
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
   ```
 
-- **Check for updates**: Read `~/.cargo/bin/.skills-store/last_check_grid` and compare with current timestamp:
-  ```bash
-  cached_ts=$(cat ~/.cargo/bin/.skills-store/last_check_grid 2>/dev/null || true)
-  now=$(date +%s)
-  ```
-  - If `cached_ts` is non-empty and `(now - cached_ts) < 43200` (12 hours), skip the update.
-  - Otherwise, run the installer to check for updates.
-
-### Step 3: Check strategy-grid
+### Step 3: Check strategy-grid binary and version
 
 ```bash
 which strategy-grid
 ```
 
-- **Found** → proceed.
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-grid
   ```
-  - If install **succeeds** → verify with `strategy-grid --version`, then proceed.
-  - If install **fails** → notify the user:
+  - If install **fails** → notify user and stop.
+
+- **Check for updates** (12h cache):
+  ```bash
+  CACHE="$HOME/.plugin-store/update_check/skill-strategy-grid"
+  NOW=$(date +%s)
+  LAST=$(cat "$CACHE" 2>/dev/null || echo 0)
+  if [ $((NOW - LAST)) -ge 43200 ]; then
+    mkdir -p "$(dirname "$CACHE")" && echo "$NOW" > "$CACHE"
+    LOCAL=$(strategy-grid --version 2>/dev/null | awk '{print $2}')
+    LATEST=$(curl -sSf --max-time 3 \
+      "https://api.github.com/repos/purong-huang-1121/plugin-store/releases/latest" \
+      2>/dev/null | grep '"tag_name"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+    [ -n "$LATEST" ] && [ "$LATEST" != "$LOCAL" ] && echo "NEW_VERSION:$LATEST"
+  fi
+  ```
+  - If output contains `NEW_VERSION:X.X.X` → tell user:
     ```
-    自动安装失败，请手动安装 strategy-grid：
-    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-grid
+    strategy-grid 有新版本 X.X.X 可用，建议更新（当前 {LOCAL}）：
+    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-grid \
+      && npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade --yes
     ```
-    Stop here until user confirms installation.
+    Ask user if they want to update now before continuing.
+  - Otherwise → proceed silently.
 
 ## Prerequisites
 
@@ -146,7 +154,7 @@ strategy-grid start
 展示欢迎信息前，先运行以下命令获取该策略的累计下载量（失败时显示 `-`）：
 
 ```bash
-curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-grid')))"
+curl -s "https://api.github.com/repos/purong-huang-1121/plugin-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-grid')))"
 ```
 
 将结果数字嵌入 banner 的 `📥 X 次` 处，命令失败则用 `-` 代替。
@@ -334,7 +342,7 @@ Execute one grid cycle: fetch price, detect grid crossing, execute trade if need
 
 ### strategy-grid start
 
-Start the bot in foreground, executing `tick` every 60 seconds. Creates a PID file at `~/.skills-store/grid_bot.pid`. Use Ctrl+C or `grid stop` to terminate.
+Start the bot in foreground, executing `tick` every 60 seconds. Creates a PID file at `~/.plugin-store/grid_bot.pid`. Use Ctrl+C or `grid stop` to terminate.
 
 ### strategy-grid stop
 
@@ -395,7 +403,7 @@ grid_profit += estimated spread capture on SELL trades
 
 ## State Persistence
 
-State is stored at `~/.skills-store/grid_state.json` with atomic writes (write to .tmp, rename). Includes: grid parameters, price history (last 288 = 24h at 5min), trade history (last 50), balance snapshots, cumulative stats, and error tracking. PID file at `~/.skills-store/grid_bot.pid`.
+State is stored at `~/.plugin-store/grid_state.json` with atomic writes (write to .tmp, rename). Includes: grid parameters, price history (last 288 = 24h at 5min), trade history (last 50), balance snapshots, cumulative stats, and error tracking. PID file at `~/.plugin-store/grid_bot.pid`.
 
 ## Cross-Skill Workflows
 
@@ -403,7 +411,7 @@ State is stored at `~/.skills-store/grid_state.json` with atomic writes (write t
 |---|---|
 | USDC yield optimization (Aave/Compound/Morpho) | `strategy-auto-rebalance` |
 | Aave V3 supply/withdraw/markets | `dapp-aave` |
-| Morpho vault operations | `dapp-morpho` (CLI: `skills-store morpho`) |
+| Morpho vault operations | `dapp-morpho` (CLI: `plugin-store morpho`) |
 
 
 ## Edge Cases

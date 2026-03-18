@@ -1,4 +1,4 @@
-//! Grid bot state management — persisted at ~/.skills-store/grid_state.json.
+//! Grid bot state management — persisted at ~/.plugin-store/grid_state.json.
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -98,7 +98,7 @@ impl Default for GridState {
 }
 
 impl GridState {
-    /// Load state from ~/.skills-store/grid_state.json.
+    /// Load state from ~/.plugin-store/grid_state.json.
     pub fn load() -> Result<Self> {
         let path = Self::state_path();
         if !path.exists() {
@@ -143,14 +143,14 @@ impl GridState {
     pub fn state_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("grid_state.json")
     }
 
     pub fn pid_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("grid_bot.pid")
     }
 

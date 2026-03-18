@@ -1,5 +1,5 @@
-//! Signal tracker user-configurable parameters — persisted at ~/.skills-store/signal_tracker_config.json.
-//! Log file at ~/.skills-store/signal_tracker.log.
+//! Signal tracker user-configurable parameters — persisted at ~/.plugin-store/signal_tracker_config.json.
+//! Log file at ~/.plugin-store/signal_tracker.log.
 
 use std::path::PathBuf;
 
@@ -133,14 +133,14 @@ impl SignalTrackerConfig {
     pub fn config_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("signal_tracker_config.json")
     }
 
     pub fn log_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("signal_tracker.log")
     }
 

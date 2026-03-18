@@ -1,8 +1,8 @@
 {
   "version": 1,
   "skills": {
-    "skills-store": {
-      "source": "purong-huang-1121/skills-store",
+    "plugin-store": {
+      "source": "purong-huang-1121/plugin-store",
       "sourceType": "github",
       "computedHash": "c2b9ecff7669709b00bb2dc76157477e1d81505f3d2564804a0530159d80ad48"
     }

@@ -1,4 +1,4 @@
-//! Memepump scanner state management — persisted at ~/.skills-store/memepump_scanner_state.json.
+//! Memepump scanner state management — persisted at ~/.plugin-store/memepump_scanner_state.json.
 
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
@@ -113,7 +113,7 @@ impl Default for ScannerState {
 }
 
 impl ScannerState {
-    /// Load state from ~/.skills-store/memepump_scanner_state.json.
+    /// Load state from ~/.plugin-store/memepump_scanner_state.json.
     pub fn load() -> Result<Self> {
         let path = Self::state_path();
         if !path.exists() {

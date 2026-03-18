@@ -86,10 +86,10 @@ impl Default for DaemonConfig {
 // ── Persistence ─────────────────────────────────────────────────────
 
 impl StateData {
-    /// Default file path: `~/.skills-store/auto-rebalance-state.json`.
+    /// Default file path: `~/.plugin-store/auto-rebalance-state.json`.
     pub fn default_path() -> Result<PathBuf> {
         let home = dirs::home_dir().context("cannot determine home directory")?;
-        Ok(home.join(".skills-store").join("auto-rebalance-state.json"))
+        Ok(home.join(".plugin-store").join("auto-rebalance-state.json"))
     }
 
     /// Load from the default path, returning defaults if the file is missing.

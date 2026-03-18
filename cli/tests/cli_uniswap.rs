@@ -1,15 +1,15 @@
-//! Integration tests for `skills-store uniswap` commands.
+//! Integration tests for `plugin-store uniswap` commands.
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store};
+use common::{assert_ok_and_extract_data, plugin_store};
 use predicates::prelude::*;
 
 // ─── tokens ─────────────────────────────────────────────────────────
 
 #[test]
 fn uniswap_tokens_arbitrum() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["uniswap", "tokens", "--chain", "arbitrum"])
         .output()
         .expect("failed to execute");
@@ -22,7 +22,7 @@ fn uniswap_tokens_arbitrum() {
 
 #[test]
 fn uniswap_tokens_ethereum() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["uniswap", "tokens", "--chain", "ethereum"])
         .output()
         .expect("failed to execute");
@@ -34,7 +34,7 @@ fn uniswap_tokens_ethereum() {
 
 #[test]
 fn uniswap_tokens_unsupported_chain() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["uniswap", "tokens", "--chain", "fantom"])
         .output()
         .expect("failed to execute");
@@ -47,7 +47,7 @@ fn uniswap_tokens_unsupported_chain() {
 
 #[test]
 fn uniswap_swap_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["uniswap", "swap"])
         .assert()
         .failure()
@@ -56,7 +56,7 @@ fn uniswap_swap_missing_params_fails() {
 
 #[test]
 fn uniswap_quote_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["uniswap", "quote"])
         .assert()
         .failure()
@@ -67,7 +67,7 @@ fn uniswap_quote_missing_params_fails() {
 
 #[test]
 fn uniswap_swap_without_key_or_balance_fails() {
-    let output = skills_store()
+    let output = plugin_store()
         .args([
             "uniswap", "swap", "--from", "WETH", "--to", "wstETH", "--amount", "0.01", "--chain",
             "arbitrum",

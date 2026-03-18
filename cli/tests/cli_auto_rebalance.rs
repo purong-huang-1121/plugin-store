@@ -1,8 +1,8 @@
-//! Integration tests for `skills-store auto-rebalance` commands.
+//! Integration tests for `plugin-store auto-rebalance` commands.
 
 mod common;
 
-use common::skills_store;
+use common::plugin_store;
 
 /// Mutex to serialize tests that read/write the shared daemon PID file,
 /// preventing race conditions when tests run in parallel.
@@ -15,7 +15,7 @@ fn pid_file_lock() -> &'static std::sync::Mutex<()> {
 fn daemon_pid_path() -> std::path::PathBuf {
     dirs::home_dir()
         .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join(".skills-store")
+        .join(".plugin-store")
         .join("auto-rebalance-daemon.pid")
 }
 
@@ -23,7 +23,7 @@ fn daemon_pid_path() -> std::path::PathBuf {
 
 #[test]
 fn auto_rebalance_start_help() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["auto-rebalance", "start", "--help"])
         .output()
         .expect("failed to execute");
@@ -43,7 +43,7 @@ fn auto_rebalance_status_returns_json() {
     let _guard = pid_file_lock().lock().unwrap_or_else(|e| e.into_inner());
     let _ = std::fs::remove_file(&daemon_pid_path());
 
-    let output = skills_store()
+    let output = plugin_store()
         .args(["auto-rebalance", "status"])
         .output()
         .expect("failed to execute");
@@ -66,7 +66,7 @@ fn auto_rebalance_stop_no_daemon() {
     let _guard = pid_file_lock().lock().unwrap_or_else(|e| e.into_inner());
     let _ = std::fs::remove_file(&daemon_pid_path());
 
-    let output = skills_store()
+    let output = plugin_store()
         .args(["auto-rebalance", "stop"])
         .output()
         .expect("failed to execute");
@@ -79,7 +79,7 @@ fn auto_rebalance_stop_no_daemon() {
 
 #[test]
 fn auto_rebalance_config_returns_json() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["auto-rebalance", "config"])
         .output()
         .expect("failed to execute");
@@ -109,7 +109,7 @@ fn auto_rebalance_already_running() {
     let sentinel_pid = sentinel.id();
     std::fs::write(&pid_path, sentinel_pid.to_string()).ok();
 
-    let output = skills_store()
+    let output = plugin_store()
         .args(["auto-rebalance", "start", "--interval", "1", "--yes"])
         .output()
         .expect("failed to execute");

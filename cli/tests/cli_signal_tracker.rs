@@ -1,15 +1,15 @@
-//! Integration tests for `skills-store signal-tracker` commands.
+//! Integration tests for `plugin-store signal-tracker` commands.
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 use predicates::prelude::*;
 
 // ─── status on empty state ──────────────────────────────────────────
 
 #[test]
 fn signal_tracker_status_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["signal-tracker", "status"])
         .output()
         .expect("failed to execute");
@@ -22,7 +22,7 @@ fn signal_tracker_status_empty_state() {
 
 #[test]
 fn signal_tracker_report_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["signal-tracker", "report"])
         .output()
         .expect("failed to execute");
@@ -35,7 +35,7 @@ fn signal_tracker_report_empty_state() {
 
 #[test]
 fn signal_tracker_history_empty_state() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["signal-tracker", "history"])
         .output()
         .expect("failed to execute");
@@ -69,7 +69,7 @@ fn signal_tracker_tick_dry_run() {
 
 #[test]
 fn signal_tracker_tick_missing_address() {
-    let output = skills_store()
+    let output = plugin_store()
         .env_remove("SOL_ADDRESS")
         .args(["signal-tracker", "tick"])
         .output()
@@ -86,7 +86,7 @@ fn signal_tracker_tick_missing_address() {
 
 #[test]
 fn signal_tracker_reset_without_force_warns() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["signal-tracker", "reset"])
         .output()
         .expect("failed to execute");
@@ -103,7 +103,7 @@ fn signal_tracker_reset_without_force_warns() {
 
 #[test]
 fn signal_tracker_missing_subcommand_fails() {
-    skills_store()
+    plugin_store()
         .args(["signal-tracker"])
         .assert()
         .failure()
@@ -114,7 +114,7 @@ fn signal_tracker_missing_subcommand_fails() {
 
 #[test]
 fn signal_tracker_stop_no_bot_returns_error() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["signal-tracker", "stop"])
         .output()
         .expect("failed to execute");

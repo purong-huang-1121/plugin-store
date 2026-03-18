@@ -1,5 +1,5 @@
 ---
-name: skills-store
+name: plugin-store
 description: >-
   This is the main on-chain DeFi skill. Use it for ALL of the following:
 
@@ -44,19 +44,19 @@ metadata:
 
 > **⚠️ MANDATORY FIRST STEP — 必须最先执行，任何回复之前**
 > 
-> 本 skill 加载后，**立即**运行以下命令检查 `skills-store` 二进制是否安装，然后才能做任何其他事情：
+> 本 skill 加载后，**立即**运行以下命令检查 `plugin-store` 二进制是否安装，然后才能做任何其他事情：
 > 
 > ```bash
-> which skills-store
+> which plugin-store
 > ```
 > 
 > - **未找到** → 先安装，安装完再继续：
 >   ```bash
->   curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+>   curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
 >   ```
 > - **已安装** → 验证可用：
 >   ```bash
->   skills-store --version
+>   plugin-store --version
 >   ```
 > 
 > **不得跳过此步骤。不得在安装完成前回复用户任何内容。**
@@ -86,10 +86,10 @@ Activate this section when ANY of the following is true:
 - User **just installed** this skill, or asks **"你能做什么"**, **"有什么技能"**, **"有什么功能"**, **"有什么机会"**, **"有什么赚钱机会"**, **"what can you do"**, **"list skills"** → **Show Entry Point: Strategy Discovery** (see below, with full descriptions, author, category)
 
 ### dApp 协议
-- User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `skills-store aave`
-- User asks about **Morpho** (vault、借贷) → see **[Morpho CLI Reference]** below, run `skills-store morpho`
-- User asks about **Uniswap** (换币、swap、报价) → see **[Uniswap CLI Reference]** below, run `skills-store uniswap`
-- User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `skills-store ethena`
+- User asks about **Aave** (存款、借贷、利率) → see **[Aave V3 CLI Reference]** below, run `plugin-store aave`
+- User asks about **Morpho** (vault、借贷) → see **[Morpho CLI Reference]** below, run `plugin-store morpho`
+- User asks about **Uniswap** (换币、swap、报价) → see **[Uniswap CLI Reference]** below, run `plugin-store uniswap`
+- User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `plugin-store ethena`
 
 ### 自动化策略
 - User asks about **grid trading specifically** → use `strategy-grid`
@@ -101,20 +101,20 @@ Activate this section when ANY of the following is true:
 
 | 用户意图 | 执行命令 |
 |---|---|
-| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance` |
-| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade` |
-| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper` |
-| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker` |
-| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner` |
+| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance` |
+| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade` |
+| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper` |
+| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/plugin-store --skill strategy-signal-tracker` |
+| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/plugin-store --skill strategy-memepump-scanner` |
 
 如果用户想安装**多个策略**，用空格分隔 skill 名称：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade strategy-signal-tracker
+npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade strategy-signal-tracker
 ```
 
 如果 skill 已存在，直接使用 `--yes` 覆盖安装，无需询问用户：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade --yes
 ```
 
 ### 安装后：配置 Telegram 通知（推荐）
@@ -167,14 +167,14 @@ skill_path=$(find ~ -path "*/.agents/skills/<skill-name>/SKILL.md" 2>/dev/null |
 
 ### Step 1: Run Pre-flight Check
 
-先执行上方 **Pre-flight Checks**（检查 `skills-store` 二进制是否已安装，未安装则自动安装）。
+先执行上方 **Pre-flight Checks**（检查 `plugin-store` 二进制是否已安装，未安装则自动安装）。
 
 ### Step 2: Present Built-in Strategies and Supported Platforms
 
 展示策略列表前，先运行以下命令获取各策略的累计下载量：
 
 ```bash
-curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "
+curl -s "https://api.github.com/repos/purong-huang-1121/plugin-store/releases?per_page=100" | python3 -c "
 import json,sys
 from collections import defaultdict
 default_order=['strategy-auto-rebalance','strategy-grid','strategy-ranking-sniper','strategy-signal-tracker','strategy-memepump-scanner']
@@ -296,10 +296,10 @@ onchainos --version
 | "D", "聪明钱", "signal", "跟单", "smart money" | → Go to **Flow D** |
 | "E", "memepump", "pump.fun", "meme 扫描" | → Go to **Flow E** |
 | "都要", "both", "两个都跑" | → Explain that multiple strategies can run concurrently, guide one by one |
-| "Aave", "存款", "借贷" | → Route to `skills-store aave` commands |
-| "Uniswap", "换币", "swap" | → Route to `skills-store uniswap` commands |
-| "Ethena", "sUSDe", "质押" | → Route to `skills-store ethena` commands |
-| Mentions a specific dApp platform | → Route to the corresponding `skills-store <dapp>` commands |
+| "Aave", "存款", "借贷" | → Route to `plugin-store aave` commands |
+| "Uniswap", "换币", "swap" | → Route to `plugin-store uniswap` commands |
+| "Ethena", "sUSDe", "质押" | → Route to `plugin-store ethena` commands |
+| Mentions a specific dApp platform | → Route to the corresponding `plugin-store <dapp>` commands |
 
 ---
 
@@ -308,7 +308,7 @@ onchainos --version
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导
@@ -327,7 +327,7 @@ Read file: ~/.agents/skills/strategy-auto-rebalance/SKILL.md
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导
@@ -343,7 +343,7 @@ Read file: ~/.agents/skills/strategy-grid/SKILL.md
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导
@@ -359,7 +359,7 @@ Read file: ~/.agents/skills/strategy-ranking-sniper/SKILL.md
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-signal-tracker --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导
@@ -375,7 +375,7 @@ Read file: ~/.agents/skills/strategy-signal-tracker/SKILL.md
 ### Step 1：安装策略 Skill
 
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-memepump-scanner --yes
 ```
 
 ### Step 2：读取策略 Skill 并继续引导

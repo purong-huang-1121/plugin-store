@@ -43,12 +43,12 @@ impl AppConfig {
 }
 
 fn config_path() -> Result<PathBuf> {
-    // Priority: ONCHAINOS_HOME env > ./.skills-store/ (project-local)
+    // Priority: ONCHAINOS_HOME env > ./.plugin-store/ (project-local)
     let base = match std::env::var("ONCHAINOS_HOME") {
         Ok(p) => PathBuf::from(p),
         Err(_) => std::env::current_dir()
             .context("cannot get cwd")?
-            .join(".skills-store"),
+            .join(".plugin-store"),
     };
     Ok(base.join("config.json"))
 }

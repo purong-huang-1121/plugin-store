@@ -54,11 +54,7 @@ async fn cmd_balance(address: &str) -> Result<()> {
 }
 
 async fn cmd_stake(amount: &str) -> Result<()> {
-    let client = if crate::onchainos::is_available() {
-        EthenaClient::new_with_onchainos()?
-    } else {
-        EthenaClient::new_with_signer()?
-    };
+    let client = EthenaClient::new_with_onchainos()?;
     let amount_u256 = parse_usde_amount(amount)?;
     let data = client.stake(amount_u256).await?;
     output::success(data);
@@ -66,11 +62,7 @@ async fn cmd_stake(amount: &str) -> Result<()> {
 }
 
 async fn cmd_cooldown(amount: &str) -> Result<()> {
-    let client = if crate::onchainos::is_available() {
-        EthenaClient::new_with_onchainos()?
-    } else {
-        EthenaClient::new_with_signer()?
-    };
+    let client = EthenaClient::new_with_onchainos()?;
     let amount_u256 = parse_usde_amount(amount)?;
     let data = client.cooldown(amount_u256).await?;
     output::success(data);
@@ -78,11 +70,7 @@ async fn cmd_cooldown(amount: &str) -> Result<()> {
 }
 
 async fn cmd_unstake() -> Result<()> {
-    let client = if crate::onchainos::is_available() {
-        EthenaClient::new_with_onchainos()?
-    } else {
-        EthenaClient::new_with_signer()?
-    };
+    let client = EthenaClient::new_with_onchainos()?;
     let data = client.unstake().await?;
     output::success(data);
     Ok(())

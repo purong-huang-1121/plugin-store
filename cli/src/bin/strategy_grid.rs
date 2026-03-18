@@ -1,6 +1,6 @@
 use clap::Parser;
-use skills_store_cli::commands::strategy_grid::{execute, GridCommand};
-use skills_store_cli::output;
+use plugin_store_cli::commands::strategy_grid::{execute, GridCommand};
+use plugin_store_cli::output;
 
 #[derive(Parser)]
 #[command(
@@ -15,6 +15,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    plugin_store_cli::update::check("strategy-grid", env!("CARGO_PKG_VERSION"));
     let cli = Cli::parse();
     if let Err(e) = execute(cli.command).await {
         output::error(&format!("{e:#}"));

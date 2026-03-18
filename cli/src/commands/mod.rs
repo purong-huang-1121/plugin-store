@@ -9,9 +9,7 @@ pub mod strategy_ranking_sniper;
 pub mod strategy_signal_tracker;
 
 use crate::chains;
-use crate::client::ApiClient;
 use crate::config::AppConfig;
-use anyhow::Result;
 
 /// Shared execution context for all commands.
 #[allow(dead_code)]
@@ -22,11 +20,6 @@ pub struct Context {
 }
 
 impl Context {
-    /// Create an OKX API client with HMAC-SHA256 authentication.
-    pub fn client(&self) -> Result<ApiClient> {
-        ApiClient::new(self.base_url_override.as_deref())
-    }
-
     /// Resolve chain to OKX chainIndex (e.g. "ethereum" -> "1", "solana" -> "501").
     pub fn chain_index(&self) -> Option<String> {
         let chain = self

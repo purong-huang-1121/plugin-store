@@ -1,6 +1,6 @@
 use clap::Parser;
-use skills_store_cli::commands::strategy_signal_tracker::{execute, SignalTrackerCommand};
-use skills_store_cli::output;
+use plugin_store_cli::commands::strategy_signal_tracker::{execute, SignalTrackerCommand};
+use plugin_store_cli::output;
 
 #[derive(Parser)]
 #[command(
@@ -15,6 +15,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    plugin_store_cli::update::check("strategy-signal-tracker", env!("CARGO_PKG_VERSION"));
     let cli = Cli::parse();
     if let Err(e) = execute(cli.command).await {
         output::error(&format!("{e:#}"));

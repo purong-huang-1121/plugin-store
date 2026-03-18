@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
 pub mod chains;
-pub mod client;
 pub mod commands;
+pub mod update;
 pub mod config;
 pub mod dapp;
 pub mod notifier;

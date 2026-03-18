@@ -1,5 +1,5 @@
 ---
-name: skills-store
+name: plugin-store
 description: >-
   This is the main on-chain DeFi skill. Use it for ALL of the following:
 
@@ -102,22 +102,40 @@ After presenting the welcome message, wait for the user's response. Do NOT immed
 
 Run once per session before executing any `plugin-store` command. Do not echo routine output to the user.
 
+### Step 1: Check plugin-store binary
+
 ```bash
 which plugin-store
 ```
 
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
   ```
 
-- **Check for updates**: Read `~/.local/bin/.plugin-store/last_check` and compare with current timestamp:
-  ```bash
-  cached_ts=$(cat ~/.local/bin/.plugin-store/last_check 2>/dev/null || true)
-  now=$(date +%s)
+### Step 2: Check for updates (12h cache)
+
+```bash
+CACHE="$HOME/.plugin-store/update_check/skill-plugin-store"
+NOW=$(date +%s)
+LAST=$(cat "$CACHE" 2>/dev/null || echo 0)
+if [ $((NOW - LAST)) -ge 43200 ]; then
+  mkdir -p "$(dirname "$CACHE")" && echo "$NOW" > "$CACHE"
+  LOCAL=$(plugin-store --version 2>/dev/null | awk '{print $2}')
+  LATEST=$(curl -sSf --max-time 3 \
+    "https://api.github.com/repos/purong-huang-1121/plugin-store/releases/latest" \
+    2>/dev/null | grep '"tag_name"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+  [ -n "$LATEST" ] && [ "$LATEST" != "$LOCAL" ] && echo "NEW_VERSION:$LATEST"
+fi
+```
+
+- If output contains `NEW_VERSION:X.X.X` → tell user:
   ```
-  - If `cached_ts` is non-empty and `(now - cached_ts) < 43200` (12 hours), skip the update.
-  - Otherwise, run the installer to check for updates.
+  plugin-store 有新版本 X.X.X 可用，建议更新（当前 {LOCAL}）：
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/reinstall.sh | sh
+  ```
+  Ask user if they want to update now before continuing.
+- Otherwise → proceed silently.
 
 ## Skill Routing
 
@@ -140,20 +158,20 @@ which plugin-store
 
 | 用户意图 | 执行命令 |
 |---|---|
-| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/skills-store --skill strategy-auto-rebalance` |
-| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade` |
-| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/skills-store --skill strategy-ranking-sniper` |
-| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/skills-store --skill strategy-signal-tracker` |
-| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/skills-store --skill strategy-memepump-scanner` |
+| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance` |
+| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade` |
+| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper` |
+| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/plugin-store --skill strategy-signal-tracker` |
+| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/plugin-store --skill strategy-memepump-scanner` |
 
 如果用户想安装**多个策略**，用空格分隔 skill 名称：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade strategy-signal-tracker
+npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade strategy-signal-tracker
 ```
 
 如果 skill 已存在，直接使用 `--yes` 覆盖安装，无需询问用户：
 ```bash
-npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
+npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade --yes
 ```
 
 ### 安装后：提示配置环境变量（重要）
@@ -164,10 +182,10 @@ npx skills add purong-huang-1121/skills-store --skill strategy-grid-trade --yes
 
 **USDC 智能调仓（strategy-auto-rebalance）**
 ```bash
-# ~/.cargo/bin/.env（推荐，所有策略共用）
-EVM_PRIVATE_KEY=0x你的私钥
+# 使用 onchainos 钱包登录（EVM 链签名）
+onchainos wallet login
 
-# 可选：Telegram 通知
+# 可选：Telegram 通知（在 ~/.cargo/bin/.env 中配置）
 TELEGRAM_BOT_TOKEN=你的BotToken
 TELEGRAM_CHAT_ID=你的ChatID
 ```
@@ -176,16 +194,10 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 **ETH/USDC 网格交易（strategy-grid-trade）**
 ```bash
-# ~/.cargo/bin/.env（推荐，所有策略共用）
-# OKX API（用于报价和交易执行）
-OKX_API_KEY=你的APIKey
-OKX_SECRET_KEY=你的SecretKey
-OKX_PASSPHRASE=你的Passphrase
+# 使用 onchainos 钱包登录（Base 链签名）
+onchainos wallet login
 
-# EVM 钱包（Base 链）
-EVM_PRIVATE_KEY=0x你的私钥
-
-# 可选
+# 可选（~/.cargo/bin/.env）
 BASE_RPC_URL=你的自定义RPC（默认使用公共节点）
 TELEGRAM_BOT_TOKEN=你的BotToken
 TELEGRAM_CHAT_ID=你的ChatID
@@ -195,16 +207,10 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 **SOL 涨幅榜狙击（strategy-ranking-sniper）**
 ```bash
-# ~/.cargo/bin/.env（推荐，所有策略共用）
-# Solana 钱包
-SOLANA_PRIVATE_KEY=你的Base58私钥
+# 使用 onchainos 钱包登录（Solana 链签名）
+onchainos wallet login
 
-# OKX API
-OKX_API_KEY=你的APIKey
-OKX_SECRET_KEY=你的SecretKey
-OKX_PASSPHRASE=你的Passphrase
-
-# 可选
+# 可选（~/.cargo/bin/.env）
 TELEGRAM_BOT_TOKEN=你的BotToken
 TELEGRAM_CHAT_ID=你的ChatID
 ```
@@ -213,16 +219,10 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 **SOL 聪明钱跟单（strategy-signal-tracker）**
 ```bash
-# ~/.cargo/bin/.env（推荐，所有策略共用）
-# Solana 钱包
-SOLANA_PRIVATE_KEY=你的Base58私钥
+# 使用 onchainos 钱包登录（Solana 链签名）
+onchainos wallet login
 
-# OKX API
-OKX_API_KEY=你的APIKey
-OKX_SECRET_KEY=你的SecretKey
-OKX_PASSPHRASE=你的Passphrase
-
-# 可选
+# 可选（~/.cargo/bin/.env）
 TELEGRAM_BOT_TOKEN=你的BotToken
 TELEGRAM_CHAT_ID=你的ChatID
 ```
@@ -231,16 +231,10 @@ TELEGRAM_CHAT_ID=你的ChatID
 
 **SOL Memepump 扫描（strategy-memepump-scanner）**
 ```bash
-# ~/.cargo/bin/.env（推荐，所有策略共用）
-# Solana 钱包
-SOLANA_PRIVATE_KEY=你的Base58私钥
+# 使用 onchainos 钱包登录（Solana 链签名）
+onchainos wallet login
 
-# OKX API
-OKX_API_KEY=你的APIKey
-OKX_SECRET_KEY=你的SecretKey
-OKX_PASSPHRASE=你的Passphrase
-
-# 可选
+# 可选（~/.cargo/bin/.env）
 TELEGRAM_BOT_TOKEN=你的BotToken
 TELEGRAM_CHAT_ID=你的ChatID
 ```
@@ -282,7 +276,7 @@ User says: "链上有什么赚钱机会", "有什么盈利机会", "有什么套
 展示策略列表前，先运行以下命令获取各策略的累计下载量：
 
 ```bash
-curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "
+curl -s "https://api.github.com/repos/purong-huang-1121/plugin-store/releases?per_page=100" | python3 -c "
 import json,sys
 from collections import defaultdict
 default_order=['strategy-auto-rebalance','strategy-grid','strategy-ranking-sniper','strategy-signal-tracker','strategy-memepump-scanner']
@@ -679,7 +673,7 @@ After user provides amount:
 | 预估净年化 | {net_apy}% |
 | 预估月收益 | ~${monthly} |
 
-需要 EVM_PRIVATE_KEY 签署链上交易
+需要 onchainos 钱包签署链上交易
 确认执行？(Y/n)
 ```
 
@@ -994,7 +988,7 @@ plugin-store scanner start
 | 风险 | Low | Medium-Low | Low | High | High | High |
 | 最佳市况 | 任何市况 | 震荡行情 | 存借利差为正 | Meme 行情活跃 | 聪明钱活跃期 | Pump.fun 热潮期 |
 | 最小资金 | ~$500 (ETH) | ~$50 | ~$100 (Arb) | ~0.5 SOL | ~0.3 SOL | ~0.2 SOL |
-| 需要的密钥 | EVM_PRIVATE_KEY | EVM_PRIVATE_KEY + OKX API | EVM_PRIVATE_KEY | SOL 私钥 + OKX API | SOL 私钥 + OKX API | SOL 私钥 + OKX API |
+| 需要的密钥 | onchainos 钱包 | onchainos 钱包 | onchainos 钱包 | onchainos 钱包 | onchainos 钱包 | onchainos 钱包 |
 | 运行方式 | 后台守护进程 | 后台守护进程 | AI 引导执行 | 后台守护进程 | 后台守护进程 | 后台守护进程 |
 | CLI 命令 | `plugin-store auto-rebalance` | `plugin-store grid` | `plugin-store aave` | `plugin-store ranking-sniper` | `plugin-store signal-tracker` | `plugin-store scanner` |
 
@@ -1002,32 +996,21 @@ plugin-store scanner start
 
 | 策略 | 环境变量 | 说明 |
 |------|---------|------|
-| A | `EVM_PRIVATE_KEY` | 用于签署链上交易 |
+| A | onchainos 钱包登录 | `onchainos wallet login` 授权 EVM 链签名 |
 | A (可选) | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Telegram 通知 |
-| B | `EVM_PRIVATE_KEY` | 用于签署链上交易 |
-| B | `OKX_API_KEY` + `OKX_SECRET_KEY` + `OKX_PASSPHRASE` | OKX DEX 聚合器 API |
+| B | onchainos 钱包登录 | `onchainos wallet login` 授权 Base 链签名 |
 | B (可选) | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Telegram 通知 |
-| C | `EVM_PRIVATE_KEY` | 用于签署 Aave supply/borrow 交易 |
-| D/E/F | `SOL_PRIVATE_KEY` | Solana 钱包私钥，用于链上交易 |
-| D/E/F | `OKX_API_KEY` + `OKX_SECRET_KEY` + `OKX_PASSPHRASE` | OKX DEX API（报价 + swap） |
+| C | onchainos 钱包登录 | `onchainos wallet login` 授权 Aave supply/borrow 签名 |
+| D/E/F | onchainos 钱包登录 | `onchainos wallet login` 授权 Solana 链签名 |
 
 If user hasn't set up keys, guide them:
 
 ```
-需要先配置环境变量。在 .env 文件中添加：
+需要先登录 onchainos 钱包（用于链上签名）：
 
-# EVM 策略 (A/B/C) — 钱包私钥
-EVM_PRIVATE_KEY=0x...
+onchainos wallet login
 
-# Solana 策略 (D/E/F) — 钱包私钥
-SOL_PRIVATE_KEY=...
-
-# 策略 B/D/E/F 需要 — OKX API
-OKX_API_KEY=...
-OKX_SECRET_KEY=...
-OKX_PASSPHRASE=...
-
-# 可选 — Telegram 通知
+# 可选 — Telegram 通知（在 ~/.cargo/bin/.env 中）
 TELEGRAM_BOT_TOKEN=...
 TELEGRAM_CHAT_ID=...
 ```
@@ -1039,7 +1022,7 @@ TELEGRAM_CHAT_ID=...
 | User asks for both strategies | Guide to run both in separate terminals |
 | User has no USDC | Suggest using `plugin-store uniswap swap` to swap first |
 | User has no ETH on Base | Suggest bridging or swapping |
-| EVM_PRIVATE_KEY not set | Show setup instructions before launching |
+| onchainos wallet not logged in | Show `onchainos wallet login` instructions before launching |
 | User asks about other strategies (funding rate, sUSDe loop) | These are not yet built-in — guide user through the steps using individual `plugin-store` commands (`plugin-store aave`, `plugin-store ethena`) |
 | Aave 利差为负 (borrow > supply) | Strategy C 不可执行，建议策略 A 或等待利率回归 |
 | 健康因子过低 | 策略 C 循环时自动停止（HF < 1.30），提醒用户去杠杆 |
@@ -1052,7 +1035,7 @@ TELEGRAM_CHAT_ID=...
 | User has large capital (>$10k) | Recommend A on Ethereum (higher TVL, deeper liquidity) |
 | User asks about Solana Meme 策略 | Show D/E/F options, explain each strategy's signal source differs |
 | plugin-store 未安装 | 引导安装: `curl -sSL .../install.sh \| sh` |
-| SOL_PRIVATE_KEY not set | Show setup instructions, warn about Meme 币高风险 |
+| onchainos wallet not logged in (Solana) | Show `onchainos wallet login` instructions, warn about Meme 币高风险 |
 | User asks "哪个 Solana 策略更好" | D 最稳（榜单动量）、E 最聪明（跟单）、F 最激进（Pump.fun），建议小额分散测试 |
 
 ---
@@ -1070,7 +1053,7 @@ The following dApp commands are all available via the `plugin-store` binary afte
 ### Authentication
 
 - **Data commands** (`markets`, `reserve`, `account`): No auth needed.
-- **Transaction commands** (`supply`, `withdraw`, `borrow`, `repay`): Require `EVM_PRIVATE_KEY` in `.env`.
+- **Transaction commands** (`supply`, `withdraw`, `borrow`, `repay`): Require onchainos wallet login (`onchainos wallet login`).
 
 ### Command Index
 
@@ -1121,7 +1104,7 @@ plugin-store aave repay --token USDC --amount max --chain ethereum
 ### Authentication
 
 - **All query commands** (`markets`, `market`, `vaults`, `vault`, `positions`): No auth needed.
-- **On-chain vault operations** (deposit/withdraw): Require `EVM_PRIVATE_KEY` in `.env`.
+- **On-chain vault operations** (deposit/withdraw): Require onchainos wallet login (`onchainos wallet login`).
 
 ### Command Index
 
@@ -1164,8 +1147,8 @@ plugin-store morpho positions 0xYourAddress --chain base
 ### Authentication
 
 - **`tokens`**: No auth needed.
-- **`quote`**: Requires `EVM_PRIVATE_KEY` (reads on-chain QuoterV2 contract — no gas spent).
-- **`swap`**: Requires `EVM_PRIVATE_KEY` (signs and broadcasts transaction).
+- **`quote`**: Requires onchainos wallet login (reads on-chain QuoterV2 contract — no gas spent).
+- **`swap`**: Requires onchainos wallet login (signs and broadcasts transaction).
 
 ### Command Index
 
@@ -1212,7 +1195,7 @@ plugin-store uniswap swap --from USDC --to WETH --amount 100 --chain ethereum --
 ### Authentication
 
 - **`apy`, `balance`**: No auth needed.
-- **`stake`, `cooldown`, `unstake`**: Require `EVM_PRIVATE_KEY` in `.env` (Ethereum mainnet, ETH for gas).
+- **`stake`, `cooldown`, `unstake`**: Require onchainos wallet login (Ethereum mainnet, ETH for gas).
 
 ### Command Index
 

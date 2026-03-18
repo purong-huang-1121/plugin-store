@@ -1,15 +1,15 @@
-//! Integration tests for `skills-store grid` commands.
+//! Integration tests for `plugin-store grid` commands.
 
 mod common;
 
-use common::skills_store;
+use common::plugin_store;
 use predicates::prelude::*;
 
 // ─── status (works with or without state file) ─────────────────────
 
 #[test]
 fn grid_status_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "status"])
         .output()
         .expect("failed to execute");
@@ -22,7 +22,7 @@ fn grid_status_returns_json_envelope() {
 
 #[test]
 fn grid_report_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "report"])
         .output()
         .expect("failed to execute");
@@ -35,7 +35,7 @@ fn grid_report_returns_json_envelope() {
 
 #[test]
 fn grid_history_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "history"])
         .output()
         .expect("failed to execute");
@@ -46,7 +46,7 @@ fn grid_history_returns_json_envelope() {
 
 #[test]
 fn grid_history_with_limit() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "history", "--limit", "5"])
         .output()
         .expect("failed to execute");
@@ -59,7 +59,7 @@ fn grid_history_with_limit() {
 
 #[test]
 fn grid_reset_without_force_fails() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "reset"])
         .output()
         .expect("failed to execute");
@@ -80,7 +80,7 @@ fn grid_reset_without_force_fails() {
 
 #[test]
 fn grid_deposit_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["grid", "deposit"])
         .assert()
         .failure()
@@ -91,7 +91,7 @@ fn grid_deposit_missing_params_fails() {
 
 #[test]
 fn grid_analyze_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "analyze"])
         .output()
         .expect("failed to execute");
@@ -105,7 +105,7 @@ fn grid_analyze_returns_json_envelope() {
 
 #[test]
 fn grid_tick_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "tick"])
         .output()
         .expect("failed to execute");
@@ -118,7 +118,7 @@ fn grid_tick_returns_json_envelope() {
 
 #[test]
 fn grid_retry_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["grid", "retry"])
         .output()
         .expect("failed to execute");
@@ -131,7 +131,7 @@ fn grid_retry_returns_json_envelope() {
 
 #[test]
 fn grid_help_shows_subcommands() {
-    skills_store()
+    plugin_store()
         .args(["grid", "--help"])
         .assert()
         .success()

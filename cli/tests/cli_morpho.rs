@@ -1,4 +1,4 @@
-//! Integration tests for `skills-store morpho` commands.
+//! Integration tests for `plugin-store morpho` commands.
 //!
 //! All Morpho API endpoints are public — no credentials needed.
 //! Tests that make live API calls are marked with `run_with_retry` to handle
@@ -6,7 +6,7 @@
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 
 // ─── markets ─────────────────────────────────────────────────────────────────
 
@@ -40,7 +40,7 @@ fn morpho_markets_filter_by_chain() {
 
 #[test]
 fn morpho_markets_invalid_chain_fails() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["morpho", "markets", "--chain", "notachain"])
         .output()
         .expect("failed to execute");
@@ -93,7 +93,7 @@ fn morpho_market_fetches_from_live_list() {
 
 #[test]
 fn morpho_market_missing_key_fails() {
-    skills_store()
+    plugin_store()
         .args(["morpho", "market"])
         .assert()
         .failure()
@@ -165,7 +165,7 @@ fn morpho_vault_fetches_from_live_list() {
 
 #[test]
 fn morpho_vault_missing_address_fails() {
-    skills_store()
+    plugin_store()
         .args(["morpho", "vault"])
         .assert()
         .failure()
@@ -176,7 +176,7 @@ fn morpho_vault_missing_address_fails() {
 
 #[test]
 fn morpho_positions_missing_address_fails() {
-    skills_store()
+    plugin_store()
         .args(["morpho", "positions"])
         .assert()
         .failure()

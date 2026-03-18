@@ -37,7 +37,7 @@ pub enum AutoRebalanceCommand {
     Status,
     /// Show current configuration
     Config,
-    /// Set a config parameter: skills-store auto-rebalance set --key interval_secs --value 300
+    /// Set a config parameter: plugin-store auto-rebalance set --key interval_secs --value 300
     Set {
         /// Parameter name
         #[arg(long)]
@@ -105,7 +105,7 @@ pub async fn execute(cmd: AutoRebalanceCommand) -> Result<()> {
             // File paths
             let state_path = crate::strategy::auto_rebalance::state::StateData::default_path()
                 .map(|p| p.display().to_string())
-                .unwrap_or_else(|_| "~/.skills-store/auto-rebalance-state.json".to_string());
+                .unwrap_or_else(|_| "~/.plugin-store/auto-rebalance-state.json".to_string());
 
             // Build config summary
             let config_summary = json!({
@@ -175,7 +175,7 @@ async fn cmd_config() -> Result<()> {
         "log_file": AutoRebalanceConfig::log_path().to_string_lossy(),
         "state_file": crate::strategy::auto_rebalance::state::StateData::default_path()
             .map(|p| p.display().to_string())
-            .unwrap_or_else(|_| "~/.skills-store/auto-rebalance-state.json".to_string()),
+            .unwrap_or_else(|_| "~/.plugin-store/auto-rebalance-state.json".to_string()),
         "pid_file": crate::strategy::auto_rebalance::daemon::pid_path().display().to_string(),
         "is_custom": is_custom,
         "parameters": {
@@ -219,7 +219,7 @@ async fn cmd_set(key: &str, value: &str) -> Result<()> {
         "telegram_token" => cfg.telegram_token = Some(value.to_string()),
         "telegram_chat" => cfg.telegram_chat = Some(value.to_string()),
         _ => bail!(
-            "Unknown parameter '{}'. Use 'skills-store auto-rebalance config' to see available parameters.",
+            "Unknown parameter '{}'. Use 'plugin-store auto-rebalance config' to see available parameters.",
             key
         ),
     }

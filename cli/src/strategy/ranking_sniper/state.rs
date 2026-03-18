@@ -1,4 +1,4 @@
-//! Ranking sniper state management — persisted at ~/.skills-store/ranking_sniper_state.json.
+//! Ranking sniper state management — persisted at ~/.plugin-store/ranking_sniper_state.json.
 
 use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
@@ -68,7 +68,7 @@ impl Default for SniperState {
 }
 
 impl SniperState {
-    /// Load state from ~/.skills-store/ranking_sniper_state.json.
+    /// Load state from ~/.plugin-store/ranking_sniper_state.json.
     pub fn load() -> Result<Self> {
         let path = Self::state_path();
         if !path.exists() {
@@ -113,14 +113,14 @@ impl SniperState {
     pub fn state_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("ranking_sniper_state.json")
     }
 
     pub fn pid_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("ranking_sniper.pid")
     }
 

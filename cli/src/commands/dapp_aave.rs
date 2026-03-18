@@ -128,11 +128,7 @@ async fn cmd_reserve(symbol: &str, chain: &str) -> Result<()> {
 }
 
 async fn cmd_supply(token: &str, amount: &str, chain: &str) -> Result<()> {
-    let client = if crate::onchainos::is_available() {
-        AaveClient::new_with_onchainos(chain)?
-    } else {
-        AaveClient::new_with_signer(chain)?
-    };
+    let client = AaveClient::new_with_onchainos(chain)?;
     let (asset, decimals) = client.resolve_asset(token).await?;
     let amount_u256 = parse_token_amount(amount, decimals)?;
     let data = client.supply(asset, amount_u256, decimals).await?;
@@ -141,11 +137,7 @@ async fn cmd_supply(token: &str, amount: &str, chain: &str) -> Result<()> {
 }
 
 async fn cmd_withdraw(token: &str, amount: &str, chain: &str) -> Result<()> {
-    let client = if crate::onchainos::is_available() {
-        AaveClient::new_with_onchainos(chain)?
-    } else {
-        AaveClient::new_with_signer(chain)?
-    };
+    let client = AaveClient::new_with_onchainos(chain)?;
     let (asset, decimals) = client.resolve_asset(token).await?;
     let amount_u256 = if amount == "max" {
         alloy::primitives::U256::MAX
@@ -158,7 +150,7 @@ async fn cmd_withdraw(token: &str, amount: &str, chain: &str) -> Result<()> {
 }
 
 async fn cmd_borrow(token: &str, amount: &str, chain: &str) -> Result<()> {
-    let client = AaveClient::new_with_signer(chain)?;
+    let client = AaveClient::new_with_onchainos(chain)?;
     let (asset, decimals) = client.resolve_asset(token).await?;
     let amount_u256 = parse_token_amount(amount, decimals)?;
     let data = client.borrow(asset, amount_u256, decimals).await?;
@@ -167,7 +159,7 @@ async fn cmd_borrow(token: &str, amount: &str, chain: &str) -> Result<()> {
 }
 
 async fn cmd_repay(token: &str, amount: &str, chain: &str) -> Result<()> {
-    let client = AaveClient::new_with_signer(chain)?;
+    let client = AaveClient::new_with_onchainos(chain)?;
     let (asset, decimals) = client.resolve_asset(token).await?;
     let amount_u256 = if amount == "max" {
         alloy::primitives::U256::MAX

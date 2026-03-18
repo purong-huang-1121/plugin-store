@@ -1,5 +1,5 @@
-//! Auto-rebalance user-configurable parameters — persisted at ~/.skills-store/auto_rebalance_config.json.
-//! Log file at ~/.skills-store/auto_rebalance.log.
+//! Auto-rebalance user-configurable parameters — persisted at ~/.plugin-store/auto_rebalance_config.json.
+//! Log file at ~/.plugin-store/auto_rebalance.log.
 
 use std::path::PathBuf;
 
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 fn base_dir() -> PathBuf {
     dirs::home_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join(".skills-store")
+        .join(".plugin-store")
 }
 
 /// User-tunable auto-rebalance parameters.

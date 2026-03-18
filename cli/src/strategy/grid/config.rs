@@ -1,4 +1,4 @@
-//! Grid bot user-configurable parameters — persisted at ~/.skills-store/grid_config.json.
+//! Grid bot user-configurable parameters — persisted at ~/.plugin-store/grid_config.json.
 
 use std::path::PathBuf;
 

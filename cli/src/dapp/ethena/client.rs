@@ -2,10 +2,8 @@
 
 use std::str::FromStr;
 
-use alloy::network::EthereumWallet;
 use alloy::primitives::{Address, U256};
 use alloy::providers::ProviderBuilder;
-use alloy::signers::local::PrivateKeySigner;
 use alloy::sol_types::SolCall;
 use anyhow::{bail, Context, Result};
 use serde_json::json;
@@ -20,8 +18,6 @@ const ONCHAINOS_CHAIN: &str = "eth";
 
 /// Signing mode for write operations.
 pub enum SignerMode {
-    /// Local private key signing via Alloy.
-    Local(PrivateKeySigner),
     /// onchainos wallet CLI signing.
     OnchainOs,
 }
@@ -41,19 +37,6 @@ impl EthenaClient {
         })
     }
 
-    /// Create a client with signing capability from EVM_PRIVATE_KEY.
-    pub fn new_with_signer() -> Result<Self> {
-        let rpc_url = std::env::var("ETHENA_RPC_URL").unwrap_or_else(|_| ETH_RPC.to_string());
-        let pk = std::env::var("EVM_PRIVATE_KEY")
-            .context("EVM_PRIVATE_KEY env var required for write operations")?;
-        let pk = pk.strip_prefix("0x").unwrap_or(&pk);
-        let signer: PrivateKeySigner = pk.parse().context("invalid EVM_PRIVATE_KEY")?;
-        Ok(Self {
-            signer: Some(SignerMode::Local(signer)),
-            rpc_url,
-        })
-    }
-
     /// Create a client that signs via onchainos wallet CLI.
     pub fn new_with_onchainos() -> Result<Self> {
         let rpc_url = std::env::var("ETHENA_RPC_URL").unwrap_or_else(|_| ETH_RPC.to_string());
@@ -66,7 +49,6 @@ impl EthenaClient {
     /// Get the signer's address.
     pub fn address(&self) -> Result<Address> {
         match &self.signer {
-            Some(SignerMode::Local(s)) => Ok(s.address()),
             Some(SignerMode::OnchainOs) => {
                 let addr_str = crate::onchainos::get_evm_address()?;
                 Address::from_str(&addr_str).context("invalid onchainos EVM address")
@@ -133,42 +115,6 @@ impl EthenaClient {
         let user = self.address()?;
 
         match signer {
-            SignerMode::Local(s) => {
-                let wallet = EthereumWallet::from(s.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.rpc_url.parse()?);
-
-                let usde = IERC20::new(usde_addr, &provider);
-                let current_allowance = usde.allowance(user, susde_addr).call().await?;
-                if current_allowance < amount {
-                    let approve_receipt = usde
-                        .approve(susde_addr, amount)
-                        .send()
-                        .await?
-                        .get_receipt()
-                        .await?;
-                    if !approve_receipt.status() {
-                        bail!("USDe approve transaction failed");
-                    }
-                }
-
-                let susde = IStakedUSDe::new(susde_addr, &provider);
-                let receipt = susde
-                    .deposit(amount, user)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "stake",
-                    "amount_usde": format_units_18(amount),
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs => {
                 let provider = ProviderBuilder::new().connect_http(self.rpc_url.parse()?);
 
@@ -219,31 +165,6 @@ impl EthenaClient {
         let susde_addr = Address::from_str(SUSDE_ADDRESS)?;
 
         match signer {
-            SignerMode::Local(s) => {
-                let wallet = EthereumWallet::from(s.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.rpc_url.parse()?);
-
-                let susde = IStakedUSDe::new(susde_addr, &provider);
-                let duration = susde.cooldownDuration().call().await?;
-
-                let receipt = susde
-                    .cooldownAssets(amount)
-                    .send()
-                    .await?
-                    .get_receipt()
-                    .await?;
-
-                Ok(json!({
-                    "action": "cooldown_initiated",
-                    "amount_usde": format_units_18(amount),
-                    "cooldown_days": duration.to::<u64>() as f64 / 86400.0,
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs => {
                 let provider = ProviderBuilder::new().connect_http(self.rpc_url.parse()?);
                 let susde = IStakedUSDe::new(susde_addr, &provider);
@@ -276,23 +197,6 @@ impl EthenaClient {
         let user = self.address()?;
 
         match signer {
-            SignerMode::Local(s) => {
-                let wallet = EthereumWallet::from(s.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.rpc_url.parse()?);
-
-                let susde = IStakedUSDe::new(susde_addr, &provider);
-                let receipt = susde.unstake(user).send().await?.get_receipt().await?;
-
-                Ok(json!({
-                    "action": "unstake",
-                    "receiver": format!("{}", user),
-                    "tx_hash": format!("{}", receipt.transaction_hash),
-                    "status": if receipt.status() { "success" } else { "failed" },
-                    "block_number": receipt.block_number.unwrap_or_default(),
-                }))
-            }
             SignerMode::OnchainOs => {
                 let calldata = IStakedUSDe::unstakeCall { receiver: user }.abi_encode();
                 let tx_hash = crate::onchainos::contract_call(

@@ -1,15 +1,15 @@
-//! Integration tests for `skills-store scanner` commands.
+//! Integration tests for `plugin-store scanner` commands.
 
 mod common;
 
-use common::skills_store;
+use common::plugin_store;
 use predicates::prelude::*;
 
 // ─── status (works with or without state file) ─────────────────────
 
 #[test]
 fn scanner_status_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "status"])
         .output()
         .expect("failed to execute");
@@ -23,7 +23,7 @@ fn scanner_status_returns_json_envelope() {
 
 #[test]
 fn scanner_report_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "report"])
         .output()
         .expect("failed to execute");
@@ -37,7 +37,7 @@ fn scanner_report_returns_json_envelope() {
 
 #[test]
 fn scanner_history_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "history"])
         .output()
         .expect("failed to execute");
@@ -49,7 +49,7 @@ fn scanner_history_returns_json_envelope() {
 
 #[test]
 fn scanner_history_with_limit() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "history", "--limit", "5"])
         .output()
         .expect("failed to execute");
@@ -62,7 +62,7 @@ fn scanner_history_with_limit() {
 
 #[test]
 fn scanner_reset_without_force_fails() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "reset"])
         .output()
         .expect("failed to execute");
@@ -83,7 +83,7 @@ fn scanner_reset_without_force_fails() {
 
 #[test]
 fn scanner_stop_no_bot_returns_error() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "stop"])
         .output()
         .expect("failed to execute");
@@ -96,7 +96,7 @@ fn scanner_stop_no_bot_returns_error() {
 
 #[test]
 fn scanner_tick_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "tick"])
         .output()
         .expect("failed to execute");
@@ -109,7 +109,7 @@ fn scanner_tick_returns_json_envelope() {
 
 #[test]
 fn scanner_analyze_returns_json_envelope() {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["scanner", "analyze"])
         .output()
         .expect("failed to execute");
@@ -122,7 +122,7 @@ fn scanner_analyze_returns_json_envelope() {
 
 #[test]
 fn scanner_help_shows_subcommands() {
-    skills_store()
+    plugin_store()
         .args(["scanner", "--help"])
         .assert()
         .success()
@@ -139,7 +139,7 @@ fn scanner_help_shows_subcommands() {
 
 #[test]
 fn scanner_missing_subcommand_fails() {
-    skills_store()
+    plugin_store()
         .args(["scanner"])
         .assert()
         .failure()

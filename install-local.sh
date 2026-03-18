@@ -2,9 +2,9 @@
 set -e
 
 # ──────────────────────────────────────────────────────────────
-# skills-store local installer
+# plugin-store local installer
 #
-# Usage: put this script next to the skills-store binary, then run:
+# Usage: put this script next to the plugin-store binary, then run:
 #   sh install-local.sh
 #
 # What it does:
@@ -13,7 +13,7 @@ set -e
 #   3. Add ~/.cargo/bin to PATH if needed
 # ──────────────────────────────────────────────────────────────
 
-BINARY="skills-store"
+BINARY="plugin-store"
 INSTALL_DIR="$HOME/.cargo/bin"
 
 # Resolve script directory (where the binary should be)
@@ -59,7 +59,7 @@ case ":$PATH:" in
       : # already in profile
     else
       echo "" >> "$profile"
-      echo "# Added by skills-store installer" >> "$profile"
+      echo "# Added by plugin-store installer" >> "$profile"
       echo "export PATH=\"\$HOME/.cargo/bin:\$PATH\"" >> "$profile"
       echo "Added $INSTALL_DIR to PATH in $profile"
     fi

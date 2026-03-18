@@ -2929,6 +2929,49 @@ dependencies = [
 ]
 
 [[package]]
+name = "plugin-store-cli"
+version = "1.0.0"
+dependencies = [
+ "aes-gcm",
+ "alloy",
+ "alloy-consensus",
+ "alloy-network",
+ "alloy-primitives",
+ "alloy-rlp",
+ "alloy-signer-local",
+ "anyhow",
+ "assert_cmd",
+ "base64 0.22.1",
+ "bip39",
+ "bs58",
+ "chrono",
+ "clap",
+ "coins-bip32",
+ "dirs",
+ "ed25519-dalek",
+ "hex",
+ "hmac",
+ "k256",
+ "libc",
+ "predicates",
+ "rand 0.8.5",
+ "reqwest",
+ "rmp-serde",
+ "rpassword",
+ "rsa",
+ "scrypt",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tabled",
+ "tempfile",
+ "tiny-keccak",
+ "tokio",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
 name = "polyval"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3846,49 +3889,6 @@ checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
 dependencies = [
  "digest 0.10.7",
  "rand_core 0.6.4",
-]
-
-[[package]]
-name = "skills-store-cli"
-version = "1.0.0"
-dependencies = [
- "aes-gcm",
- "alloy",
- "alloy-consensus",
- "alloy-network",
- "alloy-primitives",
- "alloy-rlp",
- "alloy-signer-local",
- "anyhow",
- "assert_cmd",
- "base64 0.22.1",
- "bip39",
- "bs58",
- "chrono",
- "clap",
- "coins-bip32",
- "dirs",
- "ed25519-dalek",
- "hex",
- "hmac",
- "k256",
- "libc",
- "predicates",
- "rand 0.8.5",
- "reqwest",
- "rmp-serde",
- "rpassword",
- "rsa",
- "scrypt",
- "serde",
- "serde_json",
- "sha2",
- "tabled",
- "tempfile",
- "tiny-keccak",
- "tokio",
- "uuid",
- "zeroize",
 ]
 
 [[package]]

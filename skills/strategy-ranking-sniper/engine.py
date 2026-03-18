@@ -645,11 +645,6 @@ def main():
         print("ERROR: onchainos not found. Install: curl -sSL .../install.sh | sh")
         sys.exit(1)
 
-    # Verify SOL_PRIVATE_KEY is set (needed for swaps)
-    if not args.dry_run and not os.environ.get("SOL_PRIVATE_KEY"):
-        print("ERROR: SOL_PRIVATE_KEY not set — required for live trading")
-        sys.exit(1)
-
     run_engine(args.budget, args.per_trade, args.dry_run, wallet)
 
 

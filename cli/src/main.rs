@@ -1,9 +1,9 @@
 use clap::{Parser, Subcommand, ValueEnum};
-use skills_store_cli::{commands, output};
+use plugin_store_cli::{commands, output};
 
 #[derive(Parser)]
 #[command(
-    name = "skills-store",
+    name = "plugin-store",
     version,
     about = "onchainOS CLI — on-chain DeFi operations"
 )]
@@ -56,6 +56,7 @@ pub enum Commands {
 
 #[tokio::main]
 async fn main() {
+    plugin_store_cli::update::check("plugin-store", env!("CARGO_PKG_VERSION"));
     let cli = Cli::parse();
 
     let result = match cli.command {

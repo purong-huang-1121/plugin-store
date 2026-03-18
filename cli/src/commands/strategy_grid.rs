@@ -48,7 +48,7 @@ pub enum GridCommand {
     },
     /// Show current bot configuration
     Config,
-    /// Set a config parameter: skills-store grid set --key tick_interval_secs --value 120
+    /// Set a config parameter: plugin-store grid set --key tick_interval_secs --value 120
     Set {
         /// Parameter name (e.g. grid_levels, tick_interval_secs, max_trade_pct)
         #[arg(long)]
@@ -921,7 +921,7 @@ async fn cmd_set(key: &str, value: &str) -> Result<()> {
             cfg.cooldown_after_errors = value.parse().context("invalid u64")?
         }
         _ => bail!(
-            "Unknown parameter '{}'. Use 'skills-store grid config' to see available parameters.",
+            "Unknown parameter '{}'. Use 'plugin-store grid config' to see available parameters.",
             key
         ),
     }

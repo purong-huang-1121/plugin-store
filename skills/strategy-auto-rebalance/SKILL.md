@@ -47,42 +47,51 @@ which onchainos
     ```
     Stop here until user confirms onchainos is available.
 
-### Step 2: Check skills-store
+### Step 2: Check plugin-store
 
 ```bash
-which skills-store
+which plugin-store
 ```
 
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
   ```
-- **Check for updates**: Read `~/.cargo/bin/.skills-store/last_check_auto_rebalance` and compare with current timestamp:
-  ```bash
-  cached_ts=$(cat ~/.cargo/bin/.skills-store/last_check_auto_rebalance 2>/dev/null || true)
-  now=$(date +%s)
-  ```
-  - If `cached_ts` is non-empty and `(now - cached_ts) < 43200` (12 hours), skip the update.
-  - Otherwise, run the installer to check for updates.
 
-### Step 3: Check strategy-auto-rebalance
+### Step 3: Check strategy-auto-rebalance binary and version
 
 ```bash
 which strategy-auto-rebalance
 ```
 
-- **Found** → proceed.
 - **Not found** → install:
   ```bash
-  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
+  curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
   ```
-  - If install **succeeds** → verify with `strategy-auto-rebalance --version`, then proceed.
-  - If install **fails** → notify the user:
+  - If install **fails** → notify user and stop.
+
+- **Check for updates** (12h cache):
+  ```bash
+  CACHE="$HOME/.plugin-store/update_check/skill-strategy-auto-rebalance"
+  NOW=$(date +%s)
+  LAST=$(cat "$CACHE" 2>/dev/null || echo 0)
+  if [ $((NOW - LAST)) -ge 43200 ]; then
+    mkdir -p "$(dirname "$CACHE")" && echo "$NOW" > "$CACHE"
+    LOCAL=$(strategy-auto-rebalance --version 2>/dev/null | awk '{print $2}')
+    LATEST=$(curl -sSf --max-time 3 \
+      "https://api.github.com/repos/purong-huang-1121/plugin-store/releases/latest" \
+      2>/dev/null | grep '"tag_name"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+    [ -n "$LATEST" ] && [ "$LATEST" != "$LOCAL" ] && echo "NEW_VERSION:$LATEST"
+  fi
+  ```
+  - If output contains `NEW_VERSION:X.X.X` → tell user:
     ```
-    自动安装失败，请手动安装 strategy-auto-rebalance：
-    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance
+    strategy-auto-rebalance 有新版本 X.X.X 可用，建议更新（当前 {LOCAL}）：
+    curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- strategy-auto-rebalance \
+      && npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance --yes
     ```
-    Stop here until user confirms installation.
+    Ask user if they want to update now before continuing.
+  - Otherwise → proceed silently.
 
 ## Post-Install Welcome
 
@@ -90,12 +99,12 @@ which strategy-auto-rebalance
 
 如果安装过程中出现安全扫描警告（如 Gen / Snyk / Socket 标记 Critical Risk），向用户说明：
 
-> ⚠️ 安全扫描警告是**误报**。`skills-store` 是开源工具，安装脚本从 GitHub 下载程序文件并做完整性校验，不存在恶意代码。警告来自安全工具对"下载并运行程序"这一模式的保守标记。
+> ⚠️ 安全扫描警告是**误报**。`plugin-store` 是开源工具，安装脚本从 GitHub 下载程序文件并做完整性校验，不存在恶意代码。警告来自安全工具对"下载并运行程序"这一模式的保守标记。
 
 展示欢迎信息前，先运行以下命令获取该策略的累计下载量（失败时显示 `-`）：
 
 ```bash
-curl -s "https://api.github.com/repos/purong-huang-1121/skills-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-auto-rebalance')))"
+curl -s "https://api.github.com/repos/purong-huang-1121/plugin-store/releases?per_page=100" | python3 -c "import json,sys;d=json.load(sys.stdin);print(sum(a['download_count'] for r in d for a in r.get('assets',[]) if a['name'].startswith('strategy-auto-rebalance')))"
 ```
 
 将结果数字嵌入 banner 的 `📥 X 次` 处，命令失败则用 `-` 代替。
@@ -161,7 +170,7 @@ Ready to start Auto-Rebalancer. Please confirm:
   Gas threshold:   5 gwei (Base) / 50 gwei (Ethereum)
   TVL alert:       20.0% (configurable, non-blocking)
   TVL emergency:   Emergency withdraw if TVL drops >30%
-  State file:      ~/.skills-store/auto-rebalance-state.json
+  State file:      ~/.plugin-store/auto-rebalance-state.json
 
 Proceed? (y/n)
 ```
@@ -175,8 +184,8 @@ Key points to verify:
 
 ## Skill Routing
 
-- For single-protocol Aave operations → use `skills-store aave`
-- For Morpho vault operations → use `skills-store morpho`
+- For single-protocol Aave operations → use `plugin-store aave`
+- For Morpho vault operations → use `plugin-store morpho`
 - For grid trading → use `strategy-grid`
 
 
@@ -275,12 +284,12 @@ strategy-auto-rebalance start [--chain <chain>] [--interval <seconds>] [--min-sp
 - TVL safety monitoring — median-based comparison triggers emergency withdraw if TVL drops >30%
 - Gas spike circuit breaker — pauses when gas exceeds chain threshold
 - Telegram notifications (🤖 Auto-Rebalancer) for all events
-- State persistence at `~/.skills-store/auto-rebalance-state.json`
+- State persistence at `~/.plugin-store/auto-rebalance-state.json`
 - PID management — prevents duplicate instances
 
 ### strategy-auto-rebalance stop
 
-Sends SIGTERM to the running daemon via PID file (`~/.skills-store/auto-rebalance-daemon.pid`).
+Sends SIGTERM to the running daemon via PID file (`~/.plugin-store/auto-rebalance-daemon.pid`).
 
 ### strategy-auto-rebalance status
 
@@ -307,8 +316,8 @@ Each cycle, the daemon:
 ### Workflow A: Research → Start Daemon
 
 ```
-1. skills-store aave markets --chain base             → check current Aave rates
-2. skills-store morpho vaults --chain base            → see Morpho vault options
+1. plugin-store aave markets --chain base             → check current Aave rates
+2. plugin-store morpho vaults --chain base            → see Morpho vault options
 3. strategy-auto-rebalance start --chain base ...     → let the daemon auto-optimize
 ```
 
@@ -316,7 +325,7 @@ Each cycle, the daemon:
 
 ```
 1. strategy-auto-rebalance status                     → review position and PnL
-2. skills-store morpho positions <address> --chain base → verify on-chain state
+2. plugin-store morpho positions <address> --chain base → verify on-chain state
 3. strategy-auto-rebalance stop                       → stop if needed
 ```
 

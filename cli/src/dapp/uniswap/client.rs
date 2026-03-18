@@ -2,10 +2,8 @@
 
 use std::str::FromStr;
 
-use alloy::network::EthereumWallet;
 use alloy::primitives::{Address, U160, U256};
 use alloy::providers::ProviderBuilder;
-use alloy::signers::local::PrivateKeySigner;
 use alloy::sol_types::SolCall;
 use anyhow::{bail, Context, Result};
 use serde_json::json;
@@ -121,7 +119,6 @@ fn addr(s: &str) -> Address {
 
 /// Signing mode for write operations.
 enum SignerMode {
-    Local(PrivateKeySigner),
     OnchainOs { chain_flag: String },
 }
 
@@ -133,24 +130,15 @@ pub struct UniswapClient {
 impl UniswapClient {
     pub fn new(chain: &str) -> Result<Self> {
         let config = get_chain_config(chain)?;
-        // Prefer onchainos wallet, fallback to EVM_PRIVATE_KEY
-        if crate::onchainos::is_available() {
-            let chain_flag = crate::onchainos::chain_flag(chain).to_string();
-            return Ok(Self {
-                config,
-                signer: SignerMode::OnchainOs { chain_flag },
-            });
-        }
-        let pk = std::env::var("EVM_PRIVATE_KEY")
-            .context("EVM_PRIVATE_KEY env var required for Uniswap swaps (or login via onchainos wallet)")?;
-        let pk = pk.strip_prefix("0x").unwrap_or(&pk);
-        let signer: PrivateKeySigner = pk.parse().context("invalid EVM_PRIVATE_KEY")?;
-        Ok(Self { config, signer: SignerMode::Local(signer) })
+        let chain_flag = crate::onchainos::chain_flag(chain).to_string();
+        Ok(Self {
+            config,
+            signer: SignerMode::OnchainOs { chain_flag },
+        })
     }
 
     fn address(&self) -> Result<Address> {
         match &self.signer {
-            SignerMode::Local(s) => Ok(s.address()),
             SignerMode::OnchainOs { .. } => {
                 let addr_str = crate::onchainos::get_evm_address()?;
                 Address::from_str(&addr_str).context("invalid onchainos EVM address")
@@ -239,43 +227,6 @@ impl UniswapClient {
         .abi_encode();
 
         let tx_hash = match &self.signer {
-            SignerMode::Local(local_signer) => {
-                let wallet = EthereumWallet::from(local_signer.clone());
-                let provider = ProviderBuilder::new()
-                    .wallet(wallet)
-                    .connect_http(self.config.rpc_url.parse()?);
-
-                // Approve
-                let erc20 = IERC20::new(token_in, &provider);
-                let current_allowance = erc20.allowance(user, router_addr).call().await?;
-                if current_allowance < amount_in {
-                    let approve_receipt = erc20
-                        .approve(router_addr, amount_in)
-                        .send()
-                        .await?
-                        .get_receipt()
-                        .await?;
-                    if !approve_receipt.status() {
-                        bail!("ERC20 approve transaction failed");
-                    }
-                }
-
-                // Swap
-                let router = ISwapRouter02::new(router_addr, &provider);
-                let receipt = router
-                    .multicall(deadline, vec![inner_calldata.into()])
-                    .send()
-                    .await
-                    .context("swap transaction failed")?
-                    .get_receipt()
-                    .await
-                    .context("failed to get swap receipt")?;
-
-                if !receipt.status() {
-                    bail!("swap transaction reverted");
-                }
-                format!("{}", receipt.transaction_hash)
-            }
             SignerMode::OnchainOs { chain_flag } => {
                 // Approve via onchainos
                 let erc20 = IERC20::new(token_in, &provider_ro);

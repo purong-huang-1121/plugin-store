@@ -1,4 +1,4 @@
-//! Ranking sniper user-configurable parameters — persisted at ~/.skills-store/ranking_sniper_config.json.
+//! Ranking sniper user-configurable parameters — persisted at ~/.plugin-store/ranking_sniper_config.json.
 
 use std::path::PathBuf;
 
@@ -145,14 +145,14 @@ impl SniperConfig {
     pub fn config_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("ranking_sniper_config.json")
     }
 
     pub fn default_log_path() -> PathBuf {
         dirs::home_dir()
             .unwrap_or_else(|| PathBuf::from("."))
-            .join(".skills-store")
+            .join(".plugin-store")
             .join("ranking_sniper.log")
     }
 

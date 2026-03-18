@@ -5,7 +5,7 @@ set -e
 # strategy binary installer / updater (macOS / Linux)
 #
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install_strategy.sh | sh -s -- <strategy-name>
+#   curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install_strategy.sh | sh -s -- <strategy-name>
 #
 # Supported strategies:
 #   strategy-auto-rebalance
@@ -19,9 +19,9 @@ set -e
 #   Linux  : x86_64, i686, aarch64, armv7l
 # ──────────────────────────────────────────────────────────────
 
-REPO="purong-huang-1121/skills-store"
+REPO="purong-huang-1121/plugin-store"
 INSTALL_DIR="$HOME/.cargo/bin"
-CACHE_BASE="$HOME/.cargo/bin/.skills-store"
+CACHE_BASE="$HOME/.cargo/bin/.plugin-store"
 
 STRATEGY="$1"
 
@@ -203,7 +203,7 @@ ensure_in_path() {
   fi
 
   echo "" >> "$profile"
-  echo "# Added by skills-store installer" >> "$profile"
+  echo "# Added by plugin-store installer" >> "$profile"
   echo "$EXPORT_LINE" >> "$profile"
   export PATH="$INSTALL_DIR:$PATH"
 

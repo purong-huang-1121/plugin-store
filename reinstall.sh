@@ -1,31 +1,31 @@
 #!/bin/sh
-# reinstall.sh — 清理并重新安装 skills-store skill
-# Usage: curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/reinstall.sh -o /tmp/reinstall.sh && sh /tmp/reinstall.sh
+# reinstall.sh — 清理并重新安装 plugin-store skill
+# Usage: curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/reinstall.sh -o /tmp/reinstall.sh && sh /tmp/reinstall.sh
 
 set -e
 
-echo "=== Step 1: 删除 skills-store 二进制 ==="
+echo "=== Step 1: 删除 plugin-store 二进制 ==="
 
 # 在常见目录和 PATH 中查找并删除
 for dir in "$HOME/.cargo/bin" "$HOME/.local/bin" /usr/local/bin /usr/bin; do
-  if [ -f "$dir/skills-store" ]; then
-    echo "删除 $dir/skills-store"
-    rm -f "$dir/skills-store"
+  if [ -f "$dir/plugin-store" ]; then
+    echo "删除 $dir/plugin-store"
+    rm -f "$dir/plugin-store"
   fi
 done
 
 # 同时清理 which 找到的（可能在其他位置）
-found=$(which skills-store 2>/dev/null || true)
+found=$(which plugin-store 2>/dev/null || true)
 if [ -n "$found" ]; then
   echo "删除 $found"
   rm -f "$found"
 fi
 
 # 清理缓存目录
-rm -rf "$HOME/.cargo/bin/.skills-store" 2>/dev/null || true
-rm -rf "$HOME/.local/bin/.skills-store" 2>/dev/null || true
+rm -rf "$HOME/.cargo/bin/.plugin-store" 2>/dev/null || true
+rm -rf "$HOME/.local/bin/.plugin-store" 2>/dev/null || true
 
-echo "✅ skills-store 二进制已清理"
+echo "✅ plugin-store 二进制已清理"
 
 echo ""
 echo "=== Step 2: 删除已安装的 skills ==="
@@ -89,9 +89,9 @@ else
 fi
 
 echo ""
-echo "=== Step 5: 安装 skills-store skill ==="
+echo "=== Step 5: 安装 plugin-store skill ==="
 
-npx skills add purong-huang-1121/skills-store --skill skills-store --yes
+npx skills add purong-huang-1121/plugin-store --skill plugin-store --yes
 SKILLS_EXIT=$?
 
 if [ $SKILLS_EXIT -ne 0 ]; then
@@ -100,8 +100,8 @@ if [ $SKILLS_EXIT -ne 0 ]; then
 fi
 
 # 验证 skill 文件确实已写入磁盘
-SKILL_FILE_1="$HOME/.agents/skills/skills-store/SKILL.md"
-SKILL_FILE_2="$HOME/.claude/skills/skills-store/SKILL.md"
+SKILL_FILE_1="$HOME/.agents/skills/plugin-store/SKILL.md"
+SKILL_FILE_2="$HOME/.claude/skills/plugin-store/SKILL.md"
 if [ ! -f "$SKILL_FILE_1" ] && [ ! -f "$SKILL_FILE_2" ]; then
   echo "⚠️  skill 文件未找到，等待写入..."
   sleep 2
@@ -111,19 +111,19 @@ if [ ! -f "$SKILL_FILE_1" ] && [ ! -f "$SKILL_FILE_2" ]; then
   fi
 fi
 
-echo "✅ skills-store skill 安装完成"
+echo "✅ plugin-store skill 安装完成"
 
 echo ""
-echo "=== Step 6: 安装 skills-store 二进制 ==="
+echo "=== Step 6: 安装 plugin-store 二进制 ==="
 
-curl -sSL https://raw.githubusercontent.com/purong-huang-1121/skills-store/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/purong-huang-1121/plugin-store/main/install.sh | sh
 export PATH="$HOME/.cargo/bin:$PATH"
 
-if ! command -v skills-store >/dev/null 2>&1; then
-  echo "❌ skills-store 二进制安装失败，请检查网络后重试" >&2
+if ! command -v plugin-store >/dev/null 2>&1; then
+  echo "❌ plugin-store 二进制安装失败，请检查网络后重试" >&2
   exit 1
 fi
-echo "✅ skills-store $(skills-store --version 2>/dev/null | awk '{print $2}') 安装完成"
+echo "✅ plugin-store $(plugin-store --version 2>/dev/null | awk '{print $2}') 安装完成"
 
 echo ""
 echo "=== Step 7: 检查 onchainos CLI ==="
@@ -144,7 +144,7 @@ if command -v onchainos >/dev/null 2>&1; then
 else
   echo "⚠️  onchainos CLI 未安装"
   echo ""
-  echo "skills-store 需要 onchainos CLI (>= $ONCHAINOS_MIN_VERSION) 来进行链上签名和交易。"
+  echo "plugin-store 需要 onchainos CLI (>= $ONCHAINOS_MIN_VERSION) 来进行链上签名和交易。"
   echo "请按照以下文档安装:"
   echo ""
   echo "  https://okg-block.sg.larksuite.com/docx/Cx7PdgNHLogZWIxGlwslfacIgl1"
@@ -159,7 +159,7 @@ mkdir -p "$HOME/.cargo/bin"
 
 if [ ! -f "$ENV_FILE" ]; then
   cat > "$ENV_FILE" <<'EOF'
-# skills-store 通知配置
+# plugin-store 通知配置
 # 配置 Telegram 机器人后，策略运行时会实时推送交易通知
 # 不需要可留空
 
@@ -187,4 +187,4 @@ else
 fi
 
 echo ""
-echo "✅ 全部完成！重新开始一个新对话即可使用 skills-store。"
+echo "✅ 全部完成！重新开始一个新对话即可使用 plugin-store。"

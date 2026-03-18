@@ -1,8 +1,8 @@
-//! Integration tests for `skills-store polymarket` commands.
+//! Integration tests for `plugin-store polymarket` commands.
 
 mod common;
 
-use common::{assert_ok_and_extract_data, skills_store, run_with_retry};
+use common::{assert_ok_and_extract_data, plugin_store, run_with_retry};
 use predicates::prelude::*;
 
 // ─── search ─────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ fn polymarket_search_with_limit() {
 
 #[test]
 fn polymarket_search_missing_query_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "search"])
         .assert()
         .failure()
@@ -60,7 +60,7 @@ fn polymarket_markets_with_tag() {
 
 #[test]
 fn polymarket_event_missing_id_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "event"])
         .assert()
         .failure()
@@ -71,7 +71,7 @@ fn polymarket_event_missing_id_fails() {
 
 /// Fetch a real token_id from Gamma API for testing CLOB endpoints.
 fn fetch_active_token_id() -> Option<String> {
-    let output = skills_store()
+    let output = plugin_store()
         .args(["polymarket", "markets", "--limit", "1"])
         .output()
         .ok()?;
@@ -108,7 +108,7 @@ fn polymarket_price_with_real_token() {
 
 #[test]
 fn polymarket_price_missing_token_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "price"])
         .assert()
         .failure()
@@ -150,15 +150,11 @@ fn polymarket_history_with_real_token() {
     );
 }
 
-// ─── trading commands (require EVM_PRIVATE_KEY) ──────────────
+// ─── trading commands (require onchainos wallet login) ──────────────
 
 #[test]
-fn polymarket_buy_missing_private_key_fails() {
-    if std::env::var("EVM_PRIVATE_KEY").is_ok() {
-        eprintln!("SKIP: EVM_PRIVATE_KEY is set");
-        return;
-    }
-    let output = skills_store()
+fn polymarket_buy_missing_wallet_fails() {
+    let output = plugin_store()
         .args([
             "polymarket",
             "buy",
@@ -174,18 +170,11 @@ fn polymarket_buy_missing_private_key_fails() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let json: serde_json::Value = serde_json::from_str(&stdout).unwrap_or_default();
     assert_eq!(json["ok"], serde_json::Value::Bool(false));
-    assert!(
-        json["error"]
-            .as_str()
-            .unwrap_or("")
-            .contains("EVM_PRIVATE_KEY"),
-        "expected error about missing private key: {json}"
-    );
 }
 
 #[test]
 fn polymarket_buy_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "buy"])
         .assert()
         .failure()
@@ -194,7 +183,7 @@ fn polymarket_buy_missing_params_fails() {
 
 #[test]
 fn polymarket_sell_missing_params_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "sell"])
         .assert()
         .failure()
@@ -203,7 +192,7 @@ fn polymarket_sell_missing_params_fails() {
 
 #[test]
 fn polymarket_cancel_missing_id_fails() {
-    skills_store()
+    plugin_store()
         .args(["polymarket", "cancel"])
         .assert()
         .failure()
@@ -211,11 +200,8 @@ fn polymarket_cancel_missing_id_fails() {
 }
 
 #[test]
-fn polymarket_orders_missing_private_key_fails() {
-    if std::env::var("EVM_PRIVATE_KEY").is_ok() {
-        return;
-    }
-    let output = skills_store()
+fn polymarket_orders_missing_wallet_fails() {
+    let output = plugin_store()
         .args(["polymarket", "orders"])
         .output()
         .expect("failed to execute");
@@ -225,11 +211,8 @@ fn polymarket_orders_missing_private_key_fails() {
 }
 
 #[test]
-fn polymarket_balance_missing_private_key_fails() {
-    if std::env::var("EVM_PRIVATE_KEY").is_ok() {
-        return;
-    }
-    let output = skills_store()
+fn polymarket_balance_missing_wallet_fails() {
+    let output = plugin_store()
         .args(["polymarket", "balance"])
         .output()
         .expect("failed to execute");
