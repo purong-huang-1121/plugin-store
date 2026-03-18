@@ -92,8 +92,11 @@ Activate this section when ANY of the following is true:
 - User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `plugin-store ethena`
 
 ### 自动化策略
-- User asks about **grid trading specifically** → use `strategy-grid`
-- User asks about **USDC yield / auto-rebalance specifically** → use `strategy-auto-rebalance`
+- User asks about **grid trading / 网格交易** → use `strategy-grid`
+- User asks about **USDC yield / auto-rebalance / 智能调仓** → use `strategy-auto-rebalance`
+- User asks about **SOL ranking sniper / 涨幅榜狙击** → use `strategy-ranking-sniper`
+- User asks about **smart money / signal tracker / 聪明钱跟单 / KOL跟单** → use `strategy-signal-tracker`
+- User asks about **memepump / pump.fun / meme scanner / 土狗扫描** → use `strategy-memepump-scanner`
 
 ### 策略安装（重要）
 
