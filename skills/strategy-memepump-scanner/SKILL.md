@@ -463,35 +463,6 @@ Sell fails → sell_fails +1
 
 ---
 
-## OKX API Endpoints Used
-
-### Trenches (Memepump) APIs
-
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/api/v6/dex/market/memepump/tokenList` | GET | MIGRATED token list with 14 server-side filters |
-| `/api/v6/dex/market/memepump/tokenDevInfo` | GET | Dev rug=0, farm<20, holdings<15% |
-| `/api/v6/dex/market/memepump/tokenBundleInfo` | GET | Bundler ATH<25%, count<5 |
-
-### Market APIs
-
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/api/v6/dex/market/candles` | GET | 1m/5m K-line for signal detection |
-| `/api/v6/dex/market/trades` | GET | Recent trades for momentum analysis |
-| `/api/v6/dex/market/price-info` | POST | Real-time price/MC/liquidity (position monitoring) |
-
-### Trade Execution APIs
-
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/api/v6/dex/aggregator/quote` | GET | Quote confirmation |
-| `/api/v6/dex/aggregator/swap-instruction` | GET | Get swap instruction |
-| `/api/v6/dex/pre-transaction/broadcast-transaction` | POST | Broadcast signed transaction |
-| `/api/v6/dex/post-transaction/orders` | GET | Confirm transaction completion |
-
----
-
 ## Execution Pipeline
 
 ```

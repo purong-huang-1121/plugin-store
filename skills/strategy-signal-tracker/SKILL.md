@@ -384,43 +384,6 @@ Examples:
 
 ---
 
-## OKX API Endpoints Used
-
-### Signal API (HMAC-signed)
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/market/signal/list` | POST | SmartMoney/KOL/Whale buy signals |
-| `/api/v6/dex/market/signal/supported/chain` | GET | Supported chains |
-
-### Market API (HMAC-signed)
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/market/price-info` | POST | MC / Liq / Holders / Price / Top10 |
-| `/api/v6/dex/market/token/search` | GET | Community recognized status |
-| `/api/v6/dex/market/candles` | GET | 1m/15m K-lines for pump check & trend stop |
-| `/api/v6/dex/market/price` | POST | Real-time price monitoring |
-
-### Trenches API (HMAC-signed)
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/market/memepump/tokenDevInfo` | GET | Dev reputation (rug=0, farm<20, hold<15%) |
-| `/api/v6/dex/market/memepump/tokenBundleInfo` | GET | Bundler analysis (ATH<25%, count<5) |
-
-### Trade Execution API (HMAC-signed)
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/balance/all-token-balances-by-address` | GET | SOL balance check |
-| `/api/v6/dex/aggregator/quote` | GET | Quote + honeypot detection |
-| `/api/v6/dex/aggregator/swap-instruction` | GET | Swap instruction for Solana |
-| `/api/v6/dex/pre-transaction/broadcast-transaction` | POST | Broadcast signed tx |
-| `/api/v6/dex/post-transaction/orders` | GET | Order confirmation (≤120s) |
-
----
-
 ## Command Index
 
 | # | Command | Auth | Description |

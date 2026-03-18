@@ -668,36 +668,6 @@ strategy-ranking-sniper sell <token_address> --amount <raw_amount>
 
 ---
 
-## OKX API Endpoints Used
-
-### Market Data APIs
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/market/token/toplist` | GET | Fetch trending token ranking by price change |
-| `/api/v6/dex/market/token/advanced-info` | GET | Token safety data (risk level, tags, dev/bundler/sniper %) |
-| `/api/v6/dex/market/price-info` | POST | Real-time token price |
-| `/api/v6/dex/market/token/holder` | GET | Holder data filtered by tag (suspicious/phishing) |
-
-### Trade Execution APIs
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/v6/dex/aggregator/swap` | GET | Get swap transaction data |
-| `/api/v6/dex/pre-transaction/broadcast-transaction` | POST | Broadcast signed transaction via OKX |
-| `/api/v6/dex/post-transaction/orders` | GET | Poll transaction confirmation status |
-
-### Solana RPC (Direct)
-
-| Method | Purpose |
-|--------|---------|
-| `getLatestBlockhash` | Fresh blockhash for transaction signing |
-| `sendTransaction` | Direct broadcast to Solana network |
-| `getSignatureStatuses` | Verify transaction confirmation |
-| `getTokenAccountsByOwner` | Check wSOL ATA balance |
-
----
-
 ## Execution Pipeline
 
 ```
