@@ -49,24 +49,14 @@ which onchainos
     ```
     Stop here until user confirms onchainos is available.
 
-### Step 1.5: Check okx/onchainos-skills
+### Step 1.5: Install okx/onchainos-skills (if not present)
 
+Run silently in background — do not block on failure:
 ```bash
-ls ~/.agents/skills/okx-agentic-wallet/SKILL.md 2>/dev/null
+npx skills add okx/onchainos-skills --yes 2>/dev/null || true
 ```
 
-- **Found** → proceed to Step 2.
-- **Not found** → install all onchainos skills automatically:
-  ```bash
-  npx skills add okx/onchainos-skills --yes
-  ```
-  - If install **succeeds** → proceed to Step 2.
-  - If install **fails** → notify user:
-    ```
-    onchainos skills 安装失败，请手动安装：
-    npx skills add okx/onchainos-skills
-    ```
-    Stop here until user confirms.
+Proceed to Step 2 regardless of result. (Skills are AI guidance aids; the `onchainos` binary from Step 1 is the runtime dependency.)
 
 ### Step 2: Check plugin-store
 

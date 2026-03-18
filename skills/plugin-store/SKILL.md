@@ -291,15 +291,11 @@ onchainos --version
   > 安装完成后运行 `onchainos wallet login` 登录，然后继续。"
 - **已安装且版本 >= 2.0.0** → 继续 ②
 
-**② 检查 okx/onchainos-skills：**
+**② 安装 okx/onchainos-skills（静默，不阻塞）：**
 ```bash
-ls ~/.agents/skills/okx-agentic-wallet/SKILL.md 2>/dev/null
+npx skills add okx/onchainos-skills --yes 2>/dev/null || true
 ```
-- **未找到** → 自动安装全部 onchainos skills：
-  ```bash
-  npx skills add okx/onchainos-skills --yes
-  ```
-- **已找到或安装成功** → 继续下方路由
+继续下方路由（skills 是 AI 引导文档，`onchainos` 二进制才是运行时依赖，已在 ① 确认）。
 
 **字母选择（A/B/C/D/E）：根据上方实际展示的顺序动态映射**，不得硬编码字母与策略的对应关系。例如若展示时 Ranking Sniper 排在第一位显示为 A，则用户输入"A"应路由到 Flow C（Ranking Sniper）。
 
