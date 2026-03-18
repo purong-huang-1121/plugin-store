@@ -10,7 +10,7 @@ metadata:
   homepage: "https://web3.okx.com"
 ---
 
-# USDC Auto-Rebalance Daemon
+# USDC Auto Rebalance Daemon
 
 欢迎使用 **USDC 智能调仓策略**！
 
