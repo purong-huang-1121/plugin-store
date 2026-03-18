@@ -29,8 +29,8 @@ description: >-
 
   Automated trading strategies (install or run): '排行榜狙击', '涨幅榜狙击', 'ranking sniper',
   'SOL sniper', '聪明钱跟单', '信号跟单', 'signal tracker', 'smart money', 'KOL跟单',
-  'memepump', 'pump扫描', 'meme scanner', 'pump.fun', 'USDC调仓', 'auto rebalance',
-  '网格交易', 'grid trading', 'grid bot', '自动化交易', 'trading bot', '量化策略'.
+  'memepump', 'pump扫描', 'Meme Scanner', 'pump.fun', 'USDC调仓', 'Auto Rebalance',
+  '网格交易', 'Grid Trading', 'Grid Bot', '自动化交易', 'Trading Bot', '量化策略'.
 
   Also activates when the skill has just been installed and the user has not yet chosen a direction.
 license: Apache-2.0
@@ -92,23 +92,23 @@ Activate this section when ANY of the following is true:
 - User asks about **Ethena** (sUSDe、质押、收益) → see **[Ethena CLI Reference]** below, run `plugin-store ethena`
 
 ### 自动化策略
-- User asks about **grid trading / 网格交易** → use `strategy-grid`
-- User asks about **USDC yield / auto-rebalance / 智能调仓** → use `strategy-auto-rebalance`
-- User asks about **SOL ranking sniper / 涨幅榜狙击** → use `strategy-ranking-sniper`
-- User asks about **smart money / signal tracker / 聪明钱跟单 / KOL跟单** → use `strategy-signal-tracker`
-- User asks about **memepump / pump.fun / meme scanner / 土狗扫描** → use `strategy-memepump-scanner`
+- User asks about **Grid Trading / 网格交易** → use `strategy-grid`
+- User asks about **USDC Yield / Auto Rebalance / 智能调仓** → use `strategy-auto-rebalance`
+- User asks about **SOL Ranking Sniper / 涨幅榜狙击** → use `strategy-ranking-sniper`
+- User asks about **Smart Money / Signal Tracker / 聪明钱跟单 / KOL跟单** → use `strategy-signal-tracker`
+- User asks about **Memepump / Pump.fun / Meme Scanner / 土狗扫描** → use `strategy-memepump-scanner`
 
 ### 策略安装（重要）
 
 当用户表达想要使用某个策略时（如"我要用网格交易"、"安装聪明钱跟单"、"我想试试涨幅榜狙击"、"我要用A和C"等），**直接执行对应的安装命令**，无需再次询问确认：
 
-| 用户意图 | 执行命令 |
-|---|---|
-| USDC 智能调仓 / auto-rebalance | `npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance` |
-| ETH/USDC 网格交易 / grid | `npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade` |
-| SOL 涨幅榜狙击 / ranking sniper | `npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper` |
-| SOL 聪明钱跟单 / signal tracker | `npx skills add purong-huang-1121/plugin-store --skill strategy-signal-tracker` |
-| SOL Memepump 扫描 / memepump | `npx skills add purong-huang-1121/plugin-store --skill strategy-memepump-scanner` |
+| 用户意图                       | 执行命令 |
+|----------------------------|---|
+| USDC 智能调仓 / Auto Rebalance  | `npx skills add purong-huang-1121/plugin-store --skill strategy-auto-rebalance` |
+| ETH/USDC 网格交易 / Grid Trade  | `npx skills add purong-huang-1121/plugin-store --skill strategy-grid-trade` |
+| SOL 涨幅榜狙击 / Ranking Sniper | `npx skills add purong-huang-1121/plugin-store --skill strategy-ranking-sniper` |
+| SOL 聪明钱跟单 / Signal Tracker | `npx skills add purong-huang-1121/plugin-store --skill strategy-signal-tracker` |
+| SOL Memepump 扫描 / Memepump Scanner | `npx skills add purong-huang-1121/plugin-store --skill strategy-memepump-scanner` |
 
 如果用户想安装**多个策略**，用空格分隔 skill 名称：
 ```bash
@@ -293,11 +293,11 @@ onchainos --version
 
 | User says | Action |
 |-----------|--------|
-| "A", "调仓", "auto-rebalance", "USDC 收益" | → Go to **Flow A** |
-| "B", "网格", "grid", "grid trading" | → Go to **Flow B** |
-| "C", "涨幅榜", "ranking", "榜单狙击" | → Go to **Flow C** |
-| "D", "聪明钱", "signal", "跟单", "smart money" | → Go to **Flow D** |
-| "E", "memepump", "pump.fun", "meme 扫描" | → Go to **Flow E** |
+| "A", "调仓", "Auto Rebalance", "USDC 收益" | → Go to **Flow A** |
+| "B", "网格", "Grid", "Grid Trading" | → Go to **Flow B** |
+| "C", "涨幅榜", "Ranking Sniper", "榜单狙击" | → Go to **Flow C** |
+| "D", "聪明钱", "Signal Tracker", "跟单", "Smart Money" | → Go to **Flow D** |
+| "E", "Memepump", "Pump.fun", "Meme Scanner" | → Go to **Flow E** |
 | "都要", "both", "两个都跑" | → Explain that multiple strategies can run concurrently, guide one by one |
 | "Aave", "存款", "借贷" | → Route to `plugin-store aave` commands |
 | "Uniswap", "换币", "swap" | → Route to `plugin-store uniswap` commands |
