@@ -47,3 +47,4 @@ yarn-error.log*
 
 # Docs (local only)
 docs/skills/.DS_Store
+docs/
