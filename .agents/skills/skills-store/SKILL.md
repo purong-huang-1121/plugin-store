@@ -46,7 +46,7 @@ Helps users discover and launch built-in automated strategies. This skill contai
 ### Trigger
 
 Activate this section when ANY of the following is true:
-- The skill was **just installed** (user ran `/install dapp-composer` or equivalent) and hasn't asked a specific question yet
+- The skill was **just installed** (user ran `/install plugin-store` or equivalent) and hasn't asked a specific question yet
 - User asks **"你能做什么"**, **"你有什么能力"**, **"支持哪些策略"**, **"有什么 skill"**, **"what can you do"**, **"what skills are available"**, **"show me all strategies"**, or any similar capability/discovery query
 - User asks **"都有哪些插件"**, **"都有什么功能"**, **"你支持什么"**
 
@@ -1026,7 +1026,7 @@ TELEGRAM_CHAT_ID=...
 | User asks about other strategies (funding rate, sUSDe loop) | These are not yet built-in — guide user through the steps using individual `plugin-store` commands (`plugin-store aave`, `plugin-store ethena`) |
 | Aave 利差为负 (borrow > supply) | Strategy C 不可执行，建议策略 A 或等待利率回归 |
 | 健康因子过低 | 策略 C 循环时自动停止（HF < 1.30），提醒用户去杠杆 |
-| User just installed dapp-composer with no follow-up | Show Post-Install Welcome listing all skills |
+| User just installed plugin-store with no follow-up | Show Post-Install Welcome listing all skills |
 | User asks "你能做什么" / "what can you do" / "有什么 skill" | Show Post-Install Welcome listing all skills |
 | User asks about a specific dApp platform | Route to the corresponding `plugin-store <dapp>` command directly |
 | User asks "支持哪些平台/协议" | Show the dApp platform table |

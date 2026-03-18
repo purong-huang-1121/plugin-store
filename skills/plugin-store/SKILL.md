@@ -68,7 +68,7 @@ metadata:
 ### Trigger
 
 Activate this section when ANY of the following is true:
-- The skill was **just installed** (user ran `/install dapp-composer` or equivalent) and hasn't asked a specific question yet
+- The skill was **just installed** (user ran `/install plugin-store` or equivalent) and hasn't asked a specific question yet
 - User asks **"你能做什么"**, **"你有什么能力"**, **"支持哪些策略"**, **"有什么 skill"**, **"what can you do"**, **"what skills are available"**, **"show me all strategies"**, or any similar capability/discovery query
 - User asks **"都有哪些插件"**, **"都有什么功能"**, **"你支持什么"**
 
